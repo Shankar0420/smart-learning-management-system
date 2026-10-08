@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submissions & Grading - Teacher Portal</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Submissions & Grading</span>
+        </div>
+
+        <main class="dashboard-content">
+          <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: 2rem;">
+            <div>
+              <a href="/teacher/assignment-management.html" class="text-muted" style="font-size: 0.85rem;">← Back to Assignments</a>
+              <h2 id="submissions-page-title" style="font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-top: 0.25rem;">
+                Student Assignment Submissions
+              </h2>
+            </div>
+
+            <!-- Filter by Assignment if multiple -->
+            <div id="assignment-filter-group" class="flex items-center gap-2">
+              <label for="sub-assignment-select" class="text-muted" style="font-size: 0.85rem;">Assignment:</label>
+              <select id="sub-assignment-select" class="form-select" style="min-width: 200px;"></select>
+            </div>
+          </div>
+
+          <div id="submissions-error-area" class="alert alert-danger hidden"></div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Submitted Student Work</h3>
+              <span class="badge badge-info" id="submissions-count-badge">0 Submissions</span>
+            </div>
+            <div class="card-body" id="submissions-table-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading submissions from MariaDB...</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Grading Modal -->
+    <div class="modal-overlay" id="grading-modal">
+      <div class="modal-container" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Grade Submission</h3>
+          <button class="modal-close" onclick="window.common.closeModal('grading-modal')">&times;</button>
+        </div>
+        <form id="grading-form">
+          <div class="modal-body">
+            <div style="margin-bottom: 1.25rem; padding: 1rem; background-color: var(--bg-alt); border-radius: var(--radius-sm);">
+              <div class="flex justify-between items-center" style="margin-bottom: 0.5rem;">
+                <strong id="grade-modal-student" style="color: var(--dark);">Student Name</strong>
+                <span class="text-muted tabular-nums" id="grade-modal-submitted-at">Date</span>
+              </div>
+              <label class="form-label" style="font-size: 0.8rem; text-transform: uppercase;">Submitted Text / Solution:</label>
+              <div id="grade-modal-content" style="white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; max-height: 200px; overflow-y: auto; background: #ffffff; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px;"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="grade-marks-input">
+                Marks Awarded (Max: <span id="grade-modal-max-marks">100</span>)
+              </label>
+              <input type="number" id="grade-marks-input" class="form-input" min="0" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="grade-feedback-input">Instructor Feedback</label>
+              <textarea
+                id="grade-feedback-input"
+                class="form-textarea"
+                rows="4"
+                placeholder="Provide constructive feedback, critique, and praise on student's solution..."
+                required
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('grading-modal')">Cancel</button>
+            <button type="submit" id="submit-grade-btn" class="btn btn-primary">Save Grade & Feedback</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/teacher/submissions.js"></script>
+  </body>
+</html>

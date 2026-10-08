@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In - Smart Learning Management System</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/auth.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body class="auth-page">
+    <div class="auth-container">
+      <!-- Left Academic Brand Panel -->
+      <div class="auth-brand-panel">
+        <div class="auth-brand-header">
+          <div class="university-badge">Galgotias University · Java Project</div>
+          <h1 class="auth-brand-title">Smart Learning Management System</h1>
+          <p class="auth-brand-desc">
+            Access your course materials, interactive lesson modules, quizzes, and university assignments through a centralized academic portal.
+          </p>
+        </div>
+
+        <div class="auth-brand-highlights">
+          <div class="brand-feature-item">
+            <div class="brand-feature-icon">📚</div>
+            <div class="brand-feature-text">
+              <h4>Modular Courseware</h4>
+              <p>Explore structured lessons with real-time completion tracking.</p>
+            </div>
+          </div>
+          <div class="brand-feature-item">
+            <div class="brand-feature-icon">⚡</div>
+            <div class="brand-feature-text">
+              <h4>Interactive Quizzes</h4>
+              <p>Automatic scoring and immediate performance feedback from MariaDB.</p>
+            </div>
+          </div>
+          <div class="brand-feature-item">
+            <div class="brand-feature-icon">🛡️</div>
+            <div class="brand-feature-text">
+              <h4>Role-Based Access Control</h4>
+              <p>Secure Spring Security authentication for Students, Teachers, and Admins.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-brand-footer">
+          Connected to Spring Boot REST Backend · MariaDB Database: <code>lms_db</code>
+        </div>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="auth-form-panel">
+        <div class="auth-card">
+          <div class="auth-card-header">
+            <div class="flex items-center justify-between">
+              <a href="/index.html" class="text-muted" style="font-size: 0.8125rem;">← Back to Home</a>
+              <button class="backend-status-pill" id="login-api-pill" onclick="window.common.openApiConfigModal()" style="cursor: pointer;">
+                <span class="status-dot connected" id="auth-status-dot"></span>
+                <span id="auth-api-label">API: 8080</span>
+              </button>
+            </div>
+            <h2 class="auth-card-title">Sign In to LMS</h2>
+            <p class="auth-card-subtitle">Enter your university credentials to continue</p>
+          </div>
+
+          <!-- Alert Container for Backend / Validation Errors -->
+          <div id="login-error-alert" class="alert alert-danger hidden" role="alert">
+            <span id="login-error-text"></span>
+          </div>
+
+          <form id="login-form" novalidate>
+            <div class="form-group">
+              <label class="form-label required" for="email">University Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="student@galgotiasuniversity.edu.in"
+                autocomplete="email"
+                required
+              />
+              <span class="form-error hidden" id="email-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="••••••••"
+                autocomplete="current-password"
+                required
+              />
+              <span class="form-error hidden" id="password-error"></span>
+            </div>
+
+            <button type="submit" id="login-submit-btn" class="btn btn-primary w-full justify-center btn-lg" style="margin-top: 0.5rem;">
+              <span id="login-btn-spinner" class="spinner hidden"></span>
+              <span id="login-btn-text">Sign In</span>
+            </button>
+          </form>
+
+          <div class="auth-footer-links">
+            <p>Don't have an account yet? <a href="/pages/register.html">Register as Student</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // If already logged in, redirect to correct role dashboard
+        if (window.auth.isAuthenticated()) {
+          const user = window.auth.getCurrentUser();
+          window.location.href = window.auth.getRoleDashboard(user.role);
+          return;
+        }
+
+        // Check if redirected because session expired
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("expired") === "true") {
+          const alert = document.getElementById("login-error-alert");
+          document.getElementById("login-error-text").innerText = "Your session has expired. Please sign in again.";
+          alert.classList.remove("hidden");
+        }
+
+        // Update API label
+        const baseUrl = window.APP_CONFIG.getApiBaseUrl();
+        document.getElementById("auth-api-label").innerText = `API: ${baseUrl.replace(/^https?:\/\//, '')}`;
+
+        // Login form submission
+        const form = document.getElementById("login-form");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const submitBtn = document.getElementById("login-submit-btn");
+        const btnText = document.getElementById("login-btn-text");
+        const btnSpinner = document.getElementById("login-btn-spinner");
+        const errorAlert = document.getElementById("login-error-alert");
+        const errorText = document.getElementById("login-error-text");
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          errorAlert.classList.add("hidden");
+          document.getElementById("email-error").classList.add("hidden");
+          document.getElementById("password-error").classList.add("hidden");
+
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+
+          // Client-side validation
+          let isValid = true;
+          if (!email) {
+            document.getElementById("email-error").innerText = "Email is required.";
+            document.getElementById("email-error").classList.remove("hidden");
+            isValid = false;
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            document.getElementById("email-error").innerText = "Please enter a valid email address.";
+            document.getElementById("email-error").classList.remove("hidden");
+            isValid = false;
+          }
+
+          if (!password) {
+            document.getElementById("password-error").innerText = "Password is required.";
+            document.getElementById("password-error").classList.remove("hidden");
+            isValid = false;
+          }
+
+          if (!isValid) return;
+
+          // Loading state
+          submitBtn.disabled = true;
+          btnSpinner.classList.remove("hidden");
+          btnText.innerText = "Authenticating...";
+
+          try {
+            const response = await window.api.post("/api/auth/login", { email, password });
+            
+            // Save token and user details
+            window.auth.saveAuth(response);
+            const user = window.auth.getCurrentUser();
+
+            window.common.showToast("Signed in successfully. Redirecting...", "success");
+
+            // Redirect based on role returned by backend
+            const returnUrl = urlParams.get("returnUrl");
+            setTimeout(() => {
+              if (returnUrl && !returnUrl.includes("login.html") && !returnUrl.includes("register.html")) {
+                window.location.href = decodeURIComponent(returnUrl);
+              } else {
+                window.location.href = window.auth.getRoleDashboard(user ? user.role : null);
+              }
+            }, 500);
+          } catch (err) {
+            errorText.innerText = err.message || "Invalid email or password.";
+            errorAlert.classList.remove("hidden");
+            submitBtn.disabled = false;
+            btnSpinner.classList.add("hidden");
+            btnText.innerText = "Sign In";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

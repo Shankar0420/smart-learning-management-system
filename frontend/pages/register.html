@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Registration - Smart Learning Management System</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/auth.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body class="auth-page">
+    <div class="auth-container">
+      <!-- Left Academic Brand Panel -->
+      <div class="auth-brand-panel">
+        <div class="auth-brand-header">
+          <div class="university-badge">Galgotias University · Java Evaluation Project</div>
+          <h1 class="auth-brand-title">Create Your Student Account</h1>
+          <p class="auth-brand-desc">
+            Register to enroll in university courses, participate in curriculum modules, take graded quizzes, and submit assignments.
+          </p>
+        </div>
+
+        <div class="auth-brand-highlights">
+          <div class="brand-feature-item">
+            <div class="brand-feature-icon">🎓</div>
+            <div class="brand-feature-text">
+              <h4>Enroll in Courses</h4>
+              <p>Explore engineering and computer science courses offered by your faculty.</p>
+            </div>
+          </div>
+          <div class="brand-feature-item">
+            <div class="brand-feature-icon">📈</div>
+            <div class="brand-feature-text">
+              <h4>Track Real Progress</h4>
+              <p>Lesson completion percentages are computed directly from the MariaDB database.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-brand-footer">
+          Galgotias University · Smart LMS Client connected to Spring Boot Backend
+        </div>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="auth-form-panel">
+        <div class="auth-card">
+          <div class="auth-card-header">
+            <div class="flex items-center justify-between">
+              <a href="/pages/login.html" class="text-muted" style="font-size: 0.8125rem;">← Back to Sign In</a>
+              <button class="backend-status-pill" onclick="window.common.openApiConfigModal()" style="cursor: pointer;">
+                <span class="status-dot connected"></span>
+                <span id="reg-api-label">API: 8080</span>
+              </button>
+            </div>
+            <h2 class="auth-card-title">Student Registration</h2>
+            <p class="auth-card-subtitle">Fill in your details to create an LMS student profile</p>
+          </div>
+
+          <div id="register-error-alert" class="alert alert-danger hidden" role="alert">
+            <span id="register-error-text"></span>
+          </div>
+
+          <form id="register-form" novalidate>
+            <div class="form-group">
+              <label class="form-label required" for="name">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-input"
+                placeholder="e.g. Shankar Choudhary"
+                required
+              />
+              <span class="form-error hidden" id="name-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="email">University Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="student@galgotiasuniversity.edu.in"
+                required
+              />
+              <span class="form-error hidden" id="email-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="At least 6 characters"
+                required
+              />
+              <span class="form-error hidden" id="password-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="confirmPassword">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                class="form-input"
+                placeholder="Re-enter your password"
+                required
+              />
+              <span class="form-error hidden" id="confirm-password-error"></span>
+            </div>
+
+            <button type="submit" id="register-submit-btn" class="btn btn-primary w-full justify-center btn-lg" style="margin-top: 0.5rem;">
+              <span id="register-btn-spinner" class="spinner hidden"></span>
+              <span id="register-btn-text">Create Account</span>
+            </button>
+          </form>
+
+          <div class="auth-footer-links">
+            <p>Already have an account? <a href="/pages/login.html">Sign In</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const baseUrl = window.APP_CONFIG.getApiBaseUrl();
+        document.getElementById("reg-api-label").innerText = `API: ${baseUrl.replace(/^https?:\/\//, '')}`;
+
+        const form = document.getElementById("register-form");
+        const nameInput = document.getElementById("name");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const submitBtn = document.getElementById("register-submit-btn");
+        const btnText = document.getElementById("register-btn-text");
+        const btnSpinner = document.getElementById("register-btn-spinner");
+        const errorAlert = document.getElementById("register-error-alert");
+        const errorText = document.getElementById("register-error-text");
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          errorAlert.classList.add("hidden");
+          document.getElementById("name-error").classList.add("hidden");
+          document.getElementById("email-error").classList.add("hidden");
+          document.getElementById("password-error").classList.add("hidden");
+          document.getElementById("confirm-password-error").classList.add("hidden");
+
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+          const confirmPassword = confirmPasswordInput.value;
+
+          let isValid = true;
+          if (!name) {
+            document.getElementById("name-error").innerText = "Full name is required.";
+            document.getElementById("name-error").classList.remove("hidden");
+            isValid = false;
+          }
+
+          if (!email) {
+            document.getElementById("email-error").innerText = "Email is required.";
+            document.getElementById("email-error").classList.remove("hidden");
+            isValid = false;
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            document.getElementById("email-error").innerText = "Please enter a valid email address.";
+            document.getElementById("email-error").classList.remove("hidden");
+            isValid = false;
+          }
+
+          if (!password) {
+            document.getElementById("password-error").innerText = "Password is required.";
+            document.getElementById("password-error").classList.remove("hidden");
+            isValid = false;
+          } else if (password.length < 6) {
+            document.getElementById("password-error").innerText = "Password must be at least 6 characters.";
+            document.getElementById("password-error").classList.remove("hidden");
+            isValid = false;
+          }
+
+          if (password !== confirmPassword) {
+            document.getElementById("confirm-password-error").innerText = "Passwords do not match.";
+            document.getElementById("confirm-password-error").classList.remove("hidden");
+            isValid = false;
+          }
+
+          if (!isValid) return;
+
+          submitBtn.disabled = true;
+          btnSpinner.classList.remove("hidden");
+          btnText.innerText = "Registering...";
+
+          try {
+            await window.api.post("/api/auth/register", {
+              name,
+              email,
+              password,
+              role: "STUDENT"
+            });
+
+            window.common.showToast("Account registered successfully! Redirecting to sign in...", "success");
+            setTimeout(() => {
+              window.location.href = "/pages/login.html?registered=true";
+            }, 1000);
+          } catch (err) {
+            errorText.innerText = err.message || "Registration failed. Please check the provided information.";
+            errorAlert.classList.remove("hidden");
+            submitBtn.disabled = false;
+            btnSpinner.classList.add("hidden");
+            btnText.innerText = "Create Account";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

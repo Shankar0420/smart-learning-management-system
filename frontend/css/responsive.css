@@ -1,0 +1,111 @@
+/**
+ * Smart Learning Management System
+ * Responsive Media Queries
+ */
+
+/* Backdrop for Mobile Sidebar */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 95;
+}
+
+/* Tablet & Mobile Screens (<= 992px) */
+@media (max-width: 992px) {
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -280px;
+    width: 280px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .dashboard-sidebar.mobile-open {
+    transform: translateX(280px);
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+
+  .dashboard-header {
+    padding: 0 1rem;
+  }
+
+  .dashboard-content {
+    padding: 1.25rem 1rem;
+  }
+
+  .learning-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-brand-panel {
+    display: none;
+  }
+
+  .auth-form-panel {
+    width: 100%;
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Small Tablets & Mobile Devices (<= 768px) */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-title-wrap h1 {
+    font-size: 1.1rem;
+  }
+
+  .modal-container {
+    max-width: 95vw;
+    margin: 0.5rem;
+  }
+
+  #toast-container {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .toast {
+    max-width: 100%;
+  }
+
+  .course-card-actions {
+    flex-direction: column;
+  }
+
+  .card-header, .card-footer {
+    padding: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* Touch & Button Ergonomics */
+@media (pointer: coarse) {
+  .btn, .nav-link, .lesson-item, .quiz-option-label {
+    min-height: 44px;
+  }
+}

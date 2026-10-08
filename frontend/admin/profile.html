@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Profile - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Administrator Profile</span>
+        </div>
+
+        <main class="dashboard-content" style="max-width: 800px;">
+          <div style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Administrator Profile</h2>
+            <p class="text-muted" style="font-size: 0.875rem;">University system administrator credentials and access scope</p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Superuser Account</h3>
+              <span class="badge badge-danger">ADMIN</span>
+            </div>
+            <div class="card-body">
+              <div class="flex items-center gap-4" style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                <div class="user-avatar-circle" id="admin-profile-avatar" style="width: 64px; height: 64px; font-size: 1.5rem; background-color: #7f1d1d; color: #fecaca;">A</div>
+                <div>
+                  <h3 id="admin-profile-name" style="font-size: 1.25rem; font-weight: 700; color: var(--dark);">-</h3>
+                  <span class="badge badge-danger" style="margin-top: 0.25rem;">SYSTEM ADMINISTRATOR</span>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+                <div>
+                  <label class="form-label text-muted">Admin Email</label>
+                  <p id="admin-profile-email" style="font-weight: 600; color: var(--dark); font-size: 1rem;">-</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted">Authority Level</label>
+                  <p style="font-weight: 600; color: var(--danger); font-size: 1rem;">Full Administrative Control (RBAC)</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted">Institution</label>
+                  <p style="font-weight: 600; color: var(--dark); font-size: 1rem;">Galgotias University</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted">Database Engine</label>
+                  <p style="font-weight: 600; color: var(--dark); font-size: 1rem;">MariaDB (lms_db)</p>
+                </div>
+              </div>
+
+              <div class="alert alert-info" style="margin-top: 2rem; margin-bottom: 0;">
+                <span>🔒 Secure administration. Authorization is strictly verified on every API request by Spring Security.</span>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/admin/profile.js"></script>
+  </body>
+</html>

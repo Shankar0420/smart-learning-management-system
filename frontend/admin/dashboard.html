@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administrator Dashboard - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Admin Dashboard</span>
+        </div>
+
+        <main class="dashboard-content">
+          <div style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">University System Administration</h2>
+            <p class="text-muted" style="font-size: 0.875rem;">Global metrics, user accounts, and course offerings from MariaDB</p>
+          </div>
+
+          <div id="admin-error-area" class="alert alert-danger hidden"></div>
+
+          <!-- Dynamic Statistics Grid from GET /api/admin/dashboard -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-blue">👨‍🎓</div>
+              <div>
+                <div class="stat-label">Total Enrolled Students</div>
+                <div class="stat-value tabular-nums" id="stat-admin-students">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-purple">👨‍🏫</div>
+              <div>
+                <div class="stat-label">Faculty Teachers</div>
+                <div class="stat-value tabular-nums" id="stat-admin-teachers">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-green">📚</div>
+              <div>
+                <div class="stat-label">Total Courses</div>
+                <div class="stat-value tabular-nums" id="stat-admin-courses">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-amber">📜</div>
+              <div>
+                <div class="stat-label">Total Enrollments</div>
+                <div class="stat-value tabular-nums" id="stat-admin-enrollments">-</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Administrative Quick Management Panels -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">User Account Control</h3>
+                <a href="/admin/users.html" class="btn btn-outline btn-sm">Manage Users</a>
+              </div>
+              <div class="card-body">
+                <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                  Oversee all university user profiles, audit role assignments, and activate or deactivate accounts.
+                </p>
+                <a href="/admin/users.html" class="btn btn-primary btn-sm w-full justify-center">
+                  Open User Management →
+                </a>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Curriculum Supervision</h3>
+                <a href="/admin/courses.html" class="btn btn-outline btn-sm">Manage Courses</a>
+              </div>
+              <div class="card-body">
+                <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                  Review published course offerings across all academic departments, faculty leads, and syllabus status.
+                </p>
+                <a href="/admin/courses.html" class="btn btn-primary btn-sm w-full justify-center">
+                  Open Course Catalog →
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Database Status Details -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Backend Architecture Summary</h3>
+              <span class="badge badge-success">MariaDB: lms_db</span>
+            </div>
+            <div class="card-body">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; font-size: 0.875rem;">
+                <div>
+                  <strong class="text-muted" style="display: block; font-size: 0.75rem; text-transform: uppercase;">REST API Backend</strong>
+                  <span>Java 17+ · Spring Boot 3</span>
+                </div>
+                <div>
+                  <strong class="text-muted" style="display: block; font-size: 0.75rem; text-transform: uppercase;">Persistence Layer</strong>
+                  <span>Spring Data JPA · Hibernate ORM</span>
+                </div>
+                <div>
+                  <strong class="text-muted" style="display: block; font-size: 0.75rem; text-transform: uppercase;">Security Protocol</strong>
+                  <span>Spring Security JWT (Stateless Bearer)</span>
+                </div>
+                <div>
+                  <strong class="text-muted" style="display: block; font-size: 0.75rem; text-transform: uppercase;">Database Engine</strong>
+                  <span>MariaDB (<code class="tabular-nums">lms_db</code>)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/admin/dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Profile - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Profile</span>
+        </div>
+
+        <main class="dashboard-content" style="max-width: 800px;">
+          <div style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Student Profile</h2>
+            <p class="text-muted" style="font-size: 0.875rem;">Your authenticated university student account information</p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Account Details</h3>
+              <span class="badge badge-success" id="profile-status-badge">Active</span>
+            </div>
+            <div class="card-body">
+              <div class="flex items-center gap-4" style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                <div class="user-avatar-circle" id="profile-avatar" style="width: 64px; height: 64px; font-size: 1.5rem;">S</div>
+                <div>
+                  <h3 id="profile-name" style="font-size: 1.25rem; font-weight: 700; color: var(--dark);">-</h3>
+                  <span id="profile-role" class="badge badge-info" style="margin-top: 0.25rem;">STUDENT</span>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+                <div>
+                  <label class="form-label text-muted">University Email</label>
+                  <p id="profile-email" style="font-weight: 600; color: var(--dark); font-size: 1rem;">-</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted">Account Status</label>
+                  <p id="profile-status-text" style="font-weight: 600; color: var(--success); font-size: 1rem;">Active</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted">Enrolled Institution</label>
+                  <p style="font-weight: 600; color: var(--dark); font-size: 1rem;">Galgotias University</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted">Account Created</label>
+                  <p id="profile-created" style="font-weight: 600; color: var(--dark); font-size: 1rem;">-</p>
+                </div>
+              </div>
+
+              <div class="alert alert-info" style="margin-top: 2rem; margin-bottom: 0;">
+                <span>🔒 Secure authentication managed via Spring Security & MariaDB. Password and hash credentials are never exposed in responses.</span>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/profile.js"></script>
+  </body>
+</html>

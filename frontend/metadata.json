@@ -1,0 +1,6 @@
+{
+  "name": "Smart Learning Management System",
+  "description": "A comprehensive, responsive LMS frontend built with HTML5, CSS3, and Vanilla JavaScript for Galgotias University Spring Boot backend.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

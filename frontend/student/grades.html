@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Academic Grades - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Grades</span>
+        </div>
+
+        <main class="dashboard-content">
+          <div style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Academic Performance & Grades</h2>
+            <p class="text-muted" style="font-size: 0.875rem;">Verified marks and instructor feedback from the MariaDB database</p>
+          </div>
+
+          <div id="grades-error-area" class="alert alert-danger hidden"></div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Gradebook Records</h3>
+              <span class="badge badge-info" id="grades-count-badge">0 Records</span>
+            </div>
+            <div class="card-body" id="grades-table-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading grades from MariaDB...</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/grades.js"></script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Learning - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Learning Classroom</span>
+        </div>
+
+        <main class="dashboard-content">
+          <!-- Back Link & Course Title -->
+          <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: 1.5rem;">
+            <div>
+              <a href="/student/courses.html" class="text-muted" style="font-size: 0.85rem;">← Back to My Courses</a>
+              <h2 id="learning-course-title" style="font-size: 1.4rem; font-weight: 700; color: var(--dark); margin-top: 0.25rem;">
+                Course Classroom
+              </h2>
+            </div>
+
+            <!-- Quick Assessment Jump Links -->
+            <div class="flex items-center gap-2">
+              <a id="course-quiz-link" href="#" class="btn btn-secondary btn-sm hidden">📝 Course Quizzes</a>
+              <a id="course-assignment-link" href="#" class="btn btn-secondary btn-sm hidden">📂 Assignments</a>
+            </div>
+          </div>
+
+          <!-- Live MariaDB Progress Bar Section -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-body" style="padding: 1.25rem 1.5rem;">
+              <div class="progress-header">
+                <span style="font-weight: 600; color: var(--dark);">Syllabus Completion</span>
+                <span id="progress-percentage-label">Calculating from database...</span>
+              </div>
+              <div class="progress-bar">
+                <div id="learning-progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Learning Split Layout: Modules Accordion + Lesson Viewer -->
+          <div class="learning-layout">
+            <!-- Left Modules Tree -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title" style="font-size: 1rem;">Modules & Lessons</h3>
+              </div>
+              <div class="card-body" id="learning-modules-tree" style="padding: 0.75rem;">
+                <div class="loading-container">
+                  <div class="spinner-primary"></div>
+                  <p>Loading syllabus...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Active Lesson Viewer -->
+            <div class="lesson-viewer-card" id="lesson-viewer-container">
+              <div class="empty-state">
+                <p class="text-muted">Select a lesson from the module list on the left to begin studying.</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/learning.js"></script>
+  </body>
+</html>

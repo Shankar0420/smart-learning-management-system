@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Courses - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Courses</span>
+        </div>
+
+        <main class="dashboard-content">
+          <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: 2rem;">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">University Courses</h2>
+              <p class="text-muted" style="font-size: 0.875rem;">Explore courses and manage your academic curriculum</p>
+            </div>
+
+            <!-- Segmented Filter Control -->
+            <div style="background: var(--bg-alt); padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; gap: 0.25rem;">
+              <button id="tab-enrolled" class="btn btn-sm btn-primary">My Enrolled Courses</button>
+              <button id="tab-all" class="btn btn-sm btn-secondary">Explore All Courses</button>
+            </div>
+          </div>
+
+          <div id="courses-error-area" class="alert alert-danger hidden"></div>
+
+          <!-- Courses Grid Container -->
+          <div id="courses-container" class="courses-grid">
+            <div class="loading-container" style="grid-column: 1 / -1;">
+              <div class="spinner-primary"></div>
+              <p>Loading courses from MariaDB...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/courses.js"></script>
+  </body>
+</html>

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Learning Management System</title>
+    <meta name="description" content="A comprehensive, responsive LMS frontend built with HTML5, CSS3, and Vanilla JavaScript for Galgotias University Spring Boot backend." />
+    <meta property="og:title" content="Smart Learning Management System" />
+    <meta property="og:description" content="A comprehensive, responsive LMS frontend built with HTML5, CSS3, and Vanilla JavaScript for Galgotias University Spring Boot backend." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+    <style>
+      .landing-nav {
+        background-color: #ffffff;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .landing-hero {
+        background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), url('/assets/images/lms_hero_banner.jpg');
+        background-size: cover;
+        background-position: center;
+        color: #ffffff;
+        padding: 5rem 2rem;
+        text-align: center;
+      }
+      .portal-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: -3rem auto 3rem;
+        padding: 0 1.5rem;
+        position: relative;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Bar Contract: Brand title, nav links, primary action -->
+    <header class="landing-nav">
+      <div class="flex items-center gap-3">
+        <div class="brand-icon">GU</div>
+        <div>
+          <strong style="font-size: 1.1rem; color: var(--dark); display: block;">Smart LMS</strong>
+          <span style="font-size: 0.75rem; color: var(--text-secondary);">Galgotias University</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3" id="auth-nav-buttons">
+        <a href="/pages/login.html" class="btn btn-secondary btn-sm">Sign In</a>
+        <a href="/pages/register.html" class="btn btn-primary btn-sm">Student Register</a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="landing-hero">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <span class="university-badge" style="display: inline-block; margin-bottom: 0.75rem; background: rgba(37, 99, 235, 0.3); padding: 0.25rem 0.75rem; border-radius: 9999px;">
+          Galgotias University · Java Evaluation Project
+        </span>
+        <h1 style="font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem;">
+          Smart Learning Management System
+        </h1>
+        <p style="font-size: 1.1rem; color: #cbd5e1; margin-bottom: 2rem; line-height: 1.6;">
+          A unified, high-performance academic platform connected to the Spring Boot REST API and MariaDB database (<code style="color: #93c5fd;">lms_db</code>).
+        </p>
+        <div class="flex justify-center gap-3" id="hero-cta-group">
+          <a href="/pages/login.html" class="btn btn-primary btn-lg">Access Portal</a>
+          <button class="btn btn-secondary btn-lg" onclick="window.common.openApiConfigModal()" style="background: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3);">
+            ⚙ Configure Backend URL
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 Role Portals -->
+    <div class="portal-cards">
+      <!-- Student Card -->
+      <div class="card" style="box-shadow: var(--shadow-lg);">
+        <div class="card-body">
+          <div class="stat-icon-wrap stat-icon-blue" style="margin-bottom: 1.25rem;">👨‍🎓</div>
+          <h3 class="card-title" style="margin-bottom: 0.5rem;">Student Portal</h3>
+          <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 1.5rem; line-height: 1.6;">
+            Browse university courses, enroll, track module progress, complete interactive lessons, attempt quizzes, and submit assignments.
+          </p>
+          <a href="/pages/login.html?role=STUDENT" class="btn btn-outline w-full justify-center">Enter as Student</a>
+        </div>
+      </div>
+
+      <!-- Teacher Card -->
+      <div class="card" style="box-shadow: var(--shadow-lg);">
+        <div class="card-body">
+          <div class="stat-icon-wrap stat-icon-green" style="margin-bottom: 1.25rem;">👨‍🏫</div>
+          <h3 class="card-title" style="margin-bottom: 0.5rem;">Teacher Portal</h3>
+          <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 1.5rem; line-height: 1.6;">
+            Create and organize courses, publish curriculum modules & lessons, build MCQ quizzes with automatic scoring, and evaluate assignment submissions.
+          </p>
+          <a href="/pages/login.html?role=TEACHER" class="btn btn-outline w-full justify-center">Enter as Teacher</a>
+        </div>
+      </div>
+
+      <!-- Admin Card -->
+      <div class="card" style="box-shadow: var(--shadow-lg);">
+        <div class="card-body">
+          <div class="stat-icon-wrap stat-icon-purple" style="margin-bottom: 1.25rem;">🏛️</div>
+          <h3 class="card-title" style="margin-bottom: 0.5rem;">Administrator</h3>
+          <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 1.5rem; line-height: 1.6;">
+            Oversee university statistics, manage student & teacher user accounts, toggle activation status, and supervise global course offerings.
+          </p>
+          <a href="/pages/login.html?role=ADMIN" class="btn btn-outline w-full justify-center">Enter as Admin</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backend Details & Health Check Section -->
+    <section style="max-width: 1200px; margin: 0 auto 4rem; padding: 0 1.5rem;">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Backend Architecture & Live REST Status</h3>
+          <span class="badge badge-info" id="live-backend-badge">Checking connection...</span>
+        </div>
+        <div class="card-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+            <div>
+              <span class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Technology Stack</span>
+              <p style="font-size: 0.9rem; font-weight: 500; margin-top: 0.25rem;">
+                Java · Spring Boot · Spring Security · JPA · MariaDB (<code class="tabular-nums">lms_db</code>)
+              </p>
+            </div>
+            <div>
+              <span class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Active API Base URL</span>
+              <p style="font-size: 0.9rem; font-weight: 500; margin-top: 0.25rem;">
+                <code id="landing-api-url" class="tabular-nums" style="background: var(--bg-alt); padding: 0.2rem 0.5rem; border-radius: 4px;">http://localhost:8080</code>
+              </p>
+            </div>
+            <div>
+              <span class="text-muted" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Security Mechanism</span>
+              <p style="font-size: 0.9rem; font-weight: 500; margin-top: 0.25rem;">
+                JWT Bearer Token (Role Authoritative: ADMIN / TEACHER / STUDENT)
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Global Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        // If user is already authenticated, update buttons to go to their dashboard
+        if (window.auth.isAuthenticated()) {
+          const user = window.auth.getCurrentUser();
+          const dashboardUrl = window.auth.getRoleDashboard(user.role);
+          const navBtns = document.getElementById("auth-nav-buttons");
+          if (navBtns) {
+            navBtns.innerHTML = `
+              <span class="text-muted" style="font-size: 0.85rem;">Signed in as <strong>${window.common.escapeHTML(user.name)}</strong> (${user.role})</span>
+              <a href="${dashboardUrl}" class="btn btn-primary btn-sm">Go to Dashboard</a>
+              <button class="btn btn-secondary btn-sm" onclick="window.auth.logout()">Log Out</button>
+            `;
+          }
+        }
+
+        // Test backend status
+        const liveBadge = document.getElementById("live-backend-badge");
+        const apiUrlEl = document.getElementById("landing-api-url");
+        if (apiUrlEl) apiUrlEl.innerText = window.APP_CONFIG.getApiBaseUrl();
+
+        const health = await window.APP_CONFIG.checkBackendHealth();
+        if (liveBadge) {
+          if (health.connected) {
+            liveBadge.className = "badge badge-success";
+            liveBadge.innerText = "✓ Spring Boot REST API Connected (200 OK)";
+          } else {
+            liveBadge.className = "badge badge-warning";
+            liveBadge.innerText = `● Backend Offline on ${health.url} (Start Spring Boot)`;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
