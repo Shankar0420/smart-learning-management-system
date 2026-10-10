@@ -106,12 +106,15 @@ public class DashboardService {
         long totalTeachers = userRepository.countByRole(Role.TEACHER);
         long totalCourses = courseRepository.count();
         long totalEnrollments = enrollmentRepository.count();
+        long pendingTeachers = userRepository.countByRoleAndApprovalStatus(Role.TEACHER, com.lms.entity.ApprovalStatus.PENDING);
 
         return new AdminDashboardResponse(
                 totalStudents,
                 totalTeachers,
                 totalCourses,
-                totalEnrollments
+                totalEnrollments,
+                pendingTeachers
         );
     }
 }
+

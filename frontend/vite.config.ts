@@ -17,6 +17,8 @@ export default defineConfig(() => {
           main: path.resolve(__dirname, 'index.html'),
           login: path.resolve(__dirname, 'pages/login.html'),
           register: path.resolve(__dirname, 'pages/register.html'),
+          registerTeacher: path.resolve(__dirname, 'pages/register-teacher.html'),
+
           studentDashboard: path.resolve(__dirname, 'student/dashboard.html'),
           studentCourses: path.resolve(__dirname, 'student/courses.html'),
           studentCourseDetails: path.resolve(__dirname, 'student/course-details.html'),

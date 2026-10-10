@@ -63,7 +63,10 @@
             </div>
             <h2 class="auth-card-title">Sign In to LMS</h2>
             <p class="auth-card-subtitle">Enter your university credentials to continue</p>
+            <div id="role-portal-indicator" class="hidden"></div>
           </div>
+
+          <div id="role-demo-hint" class="hidden"></div>
 
           <!-- Alert Container for Backend / Validation Errors -->
           <div id="login-error-alert" class="alert alert-danger hidden" role="alert">
@@ -107,7 +110,10 @@
 
           <div class="auth-footer-links">
             <p>Don't have an account yet? <a href="/pages/register.html">Register as Student</a></p>
+            <p style="margin-top: 0.5rem;">Faculty member? <a href="/pages/register-teacher.html" style="font-weight: 600; color: #166534;">Register as Teacher</a></p>
+            <p style="margin-top: 0.5rem;"><a href="/pages/login.html?role=ADMIN">Administrator Sign In</a> · <a href="/pages/register-admin.html" style="font-weight: 600; color: #6b21a8;">Register as Admin</a></p>
           </div>
+
         </div>
       </div>
     </div>
@@ -119,28 +125,155 @@
     <script src="/js/common.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        // If already logged in, redirect to correct role dashboard
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestedRole = (urlParams.get("role") || "").trim().toUpperCase();
+
+        // 1. Role-aware authentication verification
         if (window.auth.isAuthenticated()) {
           const user = window.auth.getCurrentUser();
-          window.location.href = window.auth.getRoleDashboard(user.role);
-          return;
+          const currentRole = (user && user.role) ? user.role.toUpperCase() : "";
+
+          if (requestedRole && currentRole && requestedRole !== currentRole) {
+            // Contradicting session detected: User specifically clicked the TEACHER portal,
+            // but an existing session was saved as STUDENT (or vice-versa).
+            // Clear previous session so user is not bounced to the wrong dashboard.
+            localStorage.removeItem("lms_token");
+            localStorage.removeItem("lms_user");
+            window.common.showToast(
+              `Active session was for ${currentRole}. Switched to ${requestedRole} Portal sign-in.`,
+              "info"
+            );
+          } else {
+            // Session matches requested portal (or generic login), navigate to authorized dashboard
+            window.location.href = window.auth.getRoleDashboard(currentRole);
+            return;
+          }
         }
 
-        // Check if redirected because session expired
-        const urlParams = new URLSearchParams(window.location.search);
+        // 2. Check if redirected because session expired or newly registered
         if (urlParams.get("expired") === "true") {
           const alert = document.getElementById("login-error-alert");
           document.getElementById("login-error-text").innerText = "Your session has expired. Please sign in again.";
           alert.classList.remove("hidden");
+        } else if (urlParams.get("registered") === "true") {
+          window.common.showToast("Registration successful! Please sign in with your credentials.", "success", 5000);
         }
 
-        // Update API label
+        // 3. Update API label
         const baseUrl = window.APP_CONFIG.getApiBaseUrl();
         document.getElementById("auth-api-label").innerText = `API: ${baseUrl.replace(/^https?:\/\//, '')}`;
 
-        // Login form submission
-        const form = document.getElementById("login-form");
+        // 4. Adapt page appearance according to requested role
+        const titleEl = document.querySelector(".auth-card-title");
+        const subtitleEl = document.querySelector(".auth-card-subtitle");
         const emailInput = document.getElementById("email");
+        const roleIndicator = document.getElementById("role-portal-indicator");
+        const roleHint = document.getElementById("role-demo-hint");
+        const footerLinks = document.querySelector(".auth-footer-links");
+        const submitBtnText = document.getElementById("login-btn-text");
+
+        if (requestedRole === "TEACHER") {
+          if (titleEl) titleEl.innerText = "Teacher Portal Sign In";
+          if (subtitleEl) subtitleEl.innerText = "Enter faculty credentials to manage courses, syllabus & evaluate submissions";
+          if (emailInput) emailInput.placeholder = "teacher@lms.com";
+          if (submitBtnText) submitBtnText.innerText = "Sign In as Teacher";
+          if (roleIndicator) {
+            roleIndicator.className = "role-badge role-badge-teacher";
+            roleIndicator.innerHTML = "👨‍🏫 Faculty / Teacher Portal";
+            roleIndicator.classList.remove("hidden");
+          }
+          if (roleHint) {
+            roleHint.innerHTML = `
+              <div class="demo-cred-card">
+                <div>
+                  <span style="font-weight: 600; color: #166534;">Faculty Account:</span>
+                  <code>teacher@lms.com</code> · <code>teacher123</code>
+                </div>
+                <button type="button" class="btn btn-xs btn-outline" id="autofill-teacher-btn">Quick Fill</button>
+              </div>
+            `;
+            roleHint.classList.remove("hidden");
+            document.getElementById("autofill-teacher-btn")?.addEventListener("click", () => {
+              document.getElementById("email").value = "teacher@lms.com";
+              document.getElementById("password").value = "teacher123";
+            });
+          }
+          if (footerLinks) {
+            footerLinks.innerHTML = `
+              <p>Don't have a teacher account? <a href="/pages/register-teacher.html" style="font-weight: 600; color: #166534;">Register as Teacher</a></p>
+              <p style="margin-top: 0.5rem;">Need student access? <a href="/pages/login.html?role=STUDENT">Sign In as Student</a></p>
+              <p style="margin-top: 0.5rem;"><a href="/pages/login.html?role=ADMIN" class="text-muted" style="font-size: 0.8125rem;">Administrator Sign In</a></p>
+            `;
+          }
+
+        } else if (requestedRole === "STUDENT") {
+          if (titleEl) titleEl.innerText = "Student Portal Sign In";
+          if (subtitleEl) subtitleEl.innerText = "Enter student credentials to access enrolled courses, lessons & quizzes";
+          if (emailInput) emailInput.placeholder = "student1@lms.com";
+          if (submitBtnText) submitBtnText.innerText = "Sign In as Student";
+          if (roleIndicator) {
+            roleIndicator.className = "role-badge role-badge-student";
+            roleIndicator.innerHTML = "👨‍🎓 Student Portal";
+            roleIndicator.classList.remove("hidden");
+          }
+          if (roleHint) {
+            roleHint.innerHTML = `
+              <div class="demo-cred-card">
+                <div>
+                  <span style="font-weight: 600; color: #1e40af;">Student Account:</span>
+                  <code>student1@lms.com</code> · <code>student123</code>
+                </div>
+                <button type="button" class="btn btn-xs btn-outline" id="autofill-student-btn">Quick Fill</button>
+              </div>
+            `;
+            roleHint.classList.remove("hidden");
+            document.getElementById("autofill-student-btn")?.addEventListener("click", () => {
+              document.getElementById("email").value = "student1@lms.com";
+              document.getElementById("password").value = "student123";
+            });
+          }
+          if (footerLinks) {
+            footerLinks.innerHTML = `
+              <p>Don't have an account yet? <a href="/pages/register.html">Register as Student</a></p>
+              <p style="margin-top: 0.5rem;">Faculty member? <a href="/pages/login.html?role=TEACHER">Teacher Portal Sign In</a></p>
+            `;
+          }
+        } else if (requestedRole === "ADMIN") {
+          if (titleEl) titleEl.innerText = "Administrator Sign In";
+          if (subtitleEl) subtitleEl.innerText = "Enter administrative credentials for system supervision";
+          if (emailInput) emailInput.placeholder = "admin@lms.com";
+          if (submitBtnText) submitBtnText.innerText = "Sign In as Admin";
+          if (roleIndicator) {
+            roleIndicator.className = "role-badge role-badge-admin";
+            roleIndicator.innerHTML = "🏛️ Administrator Portal";
+            roleIndicator.classList.remove("hidden");
+          }
+          if (roleHint) {
+            roleHint.innerHTML = `
+              <div class="demo-cred-card">
+                <div>
+                  <span style="font-weight: 600; color: #6b21a8;">Admin Account:</span>
+                  <code>admin@lms.com</code> · <code>admin123</code>
+                </div>
+                <button type="button" class="btn btn-xs btn-outline" id="autofill-admin-btn">Quick Fill</button>
+              </div>
+            `;
+            roleHint.classList.remove("hidden");
+            document.getElementById("autofill-admin-btn")?.addEventListener("click", () => {
+              document.getElementById("email").value = "admin@lms.com";
+              document.getElementById("password").value = "admin123";
+            });
+          }
+          if (footerLinks) {
+            footerLinks.innerHTML = `
+              <p>Need an administrator account? <a href="/pages/register-admin.html" style="font-weight: 600; color: #6b21a8;">Register as Admin</a></p>
+              <p style="margin-top: 0.5rem;"><a href="/pages/login.html?role=STUDENT">Student Sign In</a> · <a href="/pages/login.html?role=TEACHER">Teacher Sign In</a></p>
+            `;
+          }
+        }
+
+        // 5. Login form submission
+        const form = document.getElementById("login-form");
         const passwordInput = document.getElementById("password");
         const submitBtn = document.getElementById("login-submit-btn");
         const btnText = document.getElementById("login-btn-text");
@@ -185,27 +318,43 @@
           try {
             const response = await window.api.post("/api/auth/login", { email, password });
             
-            // Save token and user details
+            // Save token and user details to localStorage
             window.auth.saveAuth(response);
             const user = window.auth.getCurrentUser();
+            const actualRole = (user && user.role) ? user.role.toUpperCase() : "STUDENT";
 
-            window.common.showToast("Signed in successfully. Redirecting...", "success");
-
-            // Redirect based on role returned by backend
+            // Strict Role-Based Redirection:
+            // Teachers MUST be redirected to the Teacher Dashboard.
+            // Students MUST be redirected to the Student Dashboard.
+            // Admins MUST be redirected to the Admin Dashboard.
+            let destination = window.auth.getRoleDashboard(actualRole);
             const returnUrl = urlParams.get("returnUrl");
-            setTimeout(() => {
-              if (returnUrl && !returnUrl.includes("login.html") && !returnUrl.includes("register.html")) {
-                window.location.href = decodeURIComponent(returnUrl);
-              } else {
-                window.location.href = window.auth.getRoleDashboard(user ? user.role : null);
+
+            if (returnUrl && !returnUrl.includes("login.html") && !returnUrl.includes("register.html")) {
+              const decoded = decodeURIComponent(returnUrl);
+              // Only honor returnUrl if it belongs to the authenticated role's authorized namespace
+              if (actualRole === "TEACHER" && !decoded.startsWith("/student/") && !decoded.startsWith("/admin/")) {
+                destination = decoded;
+              } else if (actualRole === "STUDENT" && !decoded.startsWith("/teacher/") && !decoded.startsWith("/admin/")) {
+                destination = decoded;
+              } else if (actualRole === "ADMIN" && !decoded.startsWith("/student/")) {
+                destination = decoded;
               }
-            }, 500);
+            }
+
+            window.common.showToast(`Signed in successfully as ${actualRole}. Redirecting to dashboard...`, "success");
+
+            setTimeout(() => {
+              window.location.href = destination;
+            }, 350);
           } catch (err) {
             errorText.innerText = err.message || "Invalid email or password.";
             errorAlert.classList.remove("hidden");
             submitBtn.disabled = false;
             btnSpinner.classList.add("hidden");
-            btnText.innerText = "Sign In";
+            btnText.innerText = requestedRole === "TEACHER" ? "Sign In as Teacher" :
+                                requestedRole === "STUDENT" ? "Sign In as Student" :
+                                requestedRole === "ADMIN" ? "Sign In as Admin" : "Sign In";
           }
         });
       });

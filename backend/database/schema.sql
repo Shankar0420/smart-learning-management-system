@@ -14,10 +14,13 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL,
+    employee_id VARCHAR(50) UNIQUE,
+    approval_status VARCHAR(20) NOT NULL DEFAULT 'APPROVED',
     active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME NOT NULL,
     updated_at DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 -- 2. Courses table
 CREATE TABLE IF NOT EXISTS courses (

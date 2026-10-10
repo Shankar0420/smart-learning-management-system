@@ -26,6 +26,19 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PostMapping("/register-teacher")
+    public ResponseEntity<com.lms.dto.UserResponse> registerTeacher(@Valid @RequestBody com.lms.dto.TeacherRegisterRequest request) {
+        com.lms.dto.UserResponse response = authService.registerTeacher(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/register-admin")
+    public ResponseEntity<com.lms.dto.UserResponse> registerAdmin(@Valid @RequestBody com.lms.dto.AdminRegisterRequest request) {
+        com.lms.dto.UserResponse response = authService.registerAdmin(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);

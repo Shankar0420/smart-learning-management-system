@@ -59,6 +59,8 @@ public class DataInitializer implements CommandLineRunner {
         // 1. Seed Users (1 Admin, 1 Teacher, 2 Students)
         User admin = new User("System Admin", "admin@lms.com", passwordEncoder.encode("admin123"), Role.ADMIN);
         User teacher = new User("Dr. Ramesh Sharma", "teacher@lms.com", passwordEncoder.encode("teacher123"), Role.TEACHER);
+        teacher.setEmployeeId("EMP1001");
+        teacher.setApprovalStatus(ApprovalStatus.APPROVED);
         User student1 = new User("Aman Kumar", "student1@lms.com", passwordEncoder.encode("student123"), Role.STUDENT);
         User student2 = new User("Pooja Verma", "student2@lms.com", passwordEncoder.encode("student123"), Role.STUDENT);
 
@@ -66,6 +68,7 @@ public class DataInitializer implements CommandLineRunner {
         teacher = userRepository.save(teacher);
         student1 = userRepository.save(student1);
         student2 = userRepository.save(student2);
+
 
         // 2. Course 1: Java Programming Masterclass
         Course course1 = new Course();

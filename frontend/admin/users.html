@@ -25,13 +25,19 @@
               <p class="text-muted" style="font-size: 0.875rem;">Manage active faculty and student accounts with MariaDB persistence</p>
             </div>
 
-            <!-- Role Filter Tabs -->
-            <div style="background: var(--bg-alt); padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; gap: 0.25rem;">
-              <button id="filter-all" class="btn btn-sm btn-primary">All Users</button>
-              <button id="filter-students" class="btn btn-sm btn-secondary">Students</button>
-              <button id="filter-teachers" class="btn btn-sm btn-secondary">Teachers</button>
+            <!-- Actions & Role Filter Tabs -->
+            <div class="flex items-center gap-3 flex-wrap">
+              <a href="/pages/register-admin.html" class="btn btn-sm btn-primary" style="background: #7c3aed; border-color: #6d28d9;">+ Register Administrator</a>
+              <div style="background: var(--bg-alt); padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                <button id="filter-all" class="btn btn-sm btn-primary">All Users</button>
+                <button id="filter-admins" class="btn btn-sm btn-secondary" style="color: #6b21a8;">Admins</button>
+                <button id="filter-students" class="btn btn-sm btn-secondary">Students</button>
+                <button id="filter-teachers" class="btn btn-sm btn-secondary">Teachers</button>
+                <button id="filter-pending" class="btn btn-sm btn-secondary" style="color: #b45309;">⏳ Pending Teachers</button>
+              </div>
             </div>
           </div>
+
 
           <div id="users-error-area" class="alert alert-danger hidden"></div>
 

@@ -36,6 +36,13 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Column(unique = true)
+    private String employeeId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ApprovalStatus approvalStatus = ApprovalStatus.APPROVED;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -62,6 +69,16 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.approvalStatus = ApprovalStatus.APPROVED;
+    }
+
+    public User(String name, String email, String password, Role role, String employeeId, ApprovalStatus approvalStatus) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.employeeId = employeeId;
+        this.approvalStatus = approvalStatus;
     }
 
     // Getters and Setters
@@ -81,6 +98,12 @@ public class User {
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
+    public String getEmployeeId() { return employeeId; }
+    public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
+
+    public ApprovalStatus getApprovalStatus() { return approvalStatus; }
+    public void setApprovalStatus(ApprovalStatus approvalStatus) { this.approvalStatus = approvalStatus; }
+
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 
@@ -90,3 +113,4 @@ public class User {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
+

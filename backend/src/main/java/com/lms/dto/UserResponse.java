@@ -11,6 +11,8 @@ public class UserResponse {
     private String name;
     private String email;
     private String role;
+    private String employeeId;
+    private String approvalStatus;
     private boolean active;
     private LocalDateTime createdAt;
 
@@ -21,6 +23,17 @@ public class UserResponse {
         this.name = name;
         this.email = email;
         this.role = role;
+        this.active = active;
+        this.createdAt = createdAt;
+    }
+
+    public UserResponse(Long id, String name, String email, String role, String employeeId, String approvalStatus, boolean active, LocalDateTime createdAt) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.role = role;
+        this.employeeId = employeeId;
+        this.approvalStatus = approvalStatus;
         this.active = active;
         this.createdAt = createdAt;
     }
@@ -36,6 +49,12 @@ public class UserResponse {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getEmployeeId() { return employeeId; }
+    public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
+
+    public String getApprovalStatus() { return approvalStatus; }
+    public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }

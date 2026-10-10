@@ -6,6 +6,7 @@ public class AdminDashboardResponse {
     private long totalTeachers;
     private long totalCourses;
     private long totalEnrollments;
+    private long pendingTeachers;
 
     public AdminDashboardResponse() {}
 
@@ -14,6 +15,15 @@ public class AdminDashboardResponse {
         this.totalTeachers = totalTeachers;
         this.totalCourses = totalCourses;
         this.totalEnrollments = totalEnrollments;
+        this.pendingTeachers = 0;
+    }
+
+    public AdminDashboardResponse(long totalStudents, long totalTeachers, long totalCourses, long totalEnrollments, long pendingTeachers) {
+        this.totalStudents = totalStudents;
+        this.totalTeachers = totalTeachers;
+        this.totalCourses = totalCourses;
+        this.totalEnrollments = totalEnrollments;
+        this.pendingTeachers = pendingTeachers;
     }
 
     public long getTotalStudents() { return totalStudents; }
@@ -27,4 +37,7 @@ public class AdminDashboardResponse {
 
     public long getTotalEnrollments() { return totalEnrollments; }
     public void setTotalEnrollments(long totalEnrollments) { this.totalEnrollments = totalEnrollments; }
+
+    public long getPendingTeachers() { return pendingTeachers; }
+    public void setPendingTeachers(long pendingTeachers) { this.pendingTeachers = pendingTeachers; }
 }
