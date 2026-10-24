@@ -39,6 +39,26 @@ public class AssignmentService {
         this.enrollmentService = enrollmentService;
     }
 
+    public List<AssignmentResponse> getAllAssignments(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
+        if (user.getRole() == Role.ADMIN) {
+            return assignmentRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        } else if (user.getRole() == Role.TEACHER) {
+            List<Course> courses = courseRepository.findByTeacher(user);
+            return courses.stream()
+                    .flatMap(c -> assignmentRepository.findByCourseId(c.getId()).stream())
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        } else {
+            List<CourseResponse> enrolled = enrollmentService.getEnrolledCourses(userEmail);
+            return enrolled.stream()
+                    .flatMap(c -> assignmentRepository.findByCourseId(c.getId()).stream())
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
+    }
+
     public List<AssignmentResponse> getAssignmentsByCourseId(Long courseId, String userEmail) {
         enrollmentService.checkStudentEnrollmentOrTeacherAdmin(courseId, userEmail);
         return assignmentRepository.findByCourseId(courseId).stream()

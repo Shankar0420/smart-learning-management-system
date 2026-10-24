@@ -54,10 +54,10 @@ public class AuthService {
         user.setApprovalStatus(ApprovalStatus.APPROVED);
         user.setActive(true);
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
 
-        String token = jwtUtils.generateToken(user.getEmail(), user.getRole().name());
-        return new AuthResponse(token, user.getName(), user.getEmail(), user.getRole().name());
+        String token = jwtUtils.generateToken(saved.getEmail(), saved.getRole().name());
+        return new AuthResponse(token, saved.getId(), saved.getName(), saved.getEmail(), saved.getRole().name());
     }
 
     @Transactional
@@ -188,7 +188,7 @@ public class AuthService {
         }
 
         String token = jwtUtils.generateToken(user.getEmail(), user.getRole().name());
-        return new AuthResponse(token, user.getName(), user.getEmail(), user.getRole().name());
+        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
     }
 
     public User getUserByEmail(String email) {

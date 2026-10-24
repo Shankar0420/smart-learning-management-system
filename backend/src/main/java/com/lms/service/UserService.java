@@ -86,6 +86,12 @@ public class UserService {
         return mapToResponse(saved);
     }
 
+    public UserResponse getCurrentUserProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        return mapToResponse(user);
+    }
+
     public UserResponse mapToResponse(User user) {
         return new UserResponse(
                 user.getId(),

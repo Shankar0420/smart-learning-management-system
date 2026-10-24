@@ -21,6 +21,11 @@ public class AssignmentController {
         this.assignmentService = assignmentService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<AssignmentResponse>> getAllAssignments(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(assignmentService.getAllAssignments(userDetails.getUsername()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AssignmentResponse> getAssignmentById(@PathVariable Long id,
                                                                 @AuthenticationPrincipal UserDetails userDetails) {
