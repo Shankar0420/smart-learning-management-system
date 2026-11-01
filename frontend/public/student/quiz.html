@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Assessment - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Quiz Assessment</span>
+        </div>
+
+        <main class="dashboard-content" style="max-width: 900px;">
+          <div style="margin-bottom: 1.5rem;">
+            <a href="/student/courses.html" class="text-muted" style="font-size: 0.85rem;">← Back to Courses</a>
+          </div>
+
+          <div id="quiz-error-area" class="alert alert-danger hidden"></div>
+
+          <!-- Quiz Submission Result Card (shown after backend computes score) -->
+          <div id="quiz-result-container" class="card hidden" style="margin-bottom: 2rem; border-left: 4px solid var(--primary);">
+            <div class="card-body text-center" style="padding: 2.5rem;">
+              <span class="badge badge-success" style="margin-bottom: 0.75rem;">Assessment Evaluated by Spring Boot</span>
+              <h2 id="result-title" style="font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Quiz Result</h2>
+              <div class="quiz-result-score" id="result-score-display">- / -</div>
+              <p id="result-feedback" class="text-muted" style="font-size: 1rem; max-width: 500px; margin: 0 auto 1.5rem;"></p>
+              <div class="flex justify-center gap-3">
+                <button class="btn btn-secondary btn-sm" onclick="retakeQuiz()">Review / Retake Quiz</button>
+                <a href="/student/grades.html" class="btn btn-primary btn-sm">View in Gradebook</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Quiz Interactive Card -->
+          <div class="card" id="quiz-main-card">
+            <div class="card-header">
+              <div>
+                <span class="badge badge-info" style="margin-bottom: 0.25rem;">Academic Evaluation</span>
+                <h2 class="card-title" id="quiz-title">Loading Quiz...</h2>
+              </div>
+              <span class="badge badge-neutral" id="quiz-meta-count">0 Questions</span>
+            </div>
+
+            <div class="card-body" id="quiz-body-container">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading quiz questions from server...</p>
+              </div>
+            </div>
+
+            <div class="card-footer" id="quiz-footer-actions">
+              <span class="text-muted" style="font-size: 0.8rem;">Please answer all questions before submitting.</span>
+              <button id="quiz-submit-btn" class="btn btn-primary btn-lg" disabled>
+                Submit Answers for Grading
+              </button>
+            </div>
+          </div>
+
+          <!-- Previous Attempts Section -->
+          <div class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+              <h3 class="card-title" style="font-size: 1rem;">Previous Attempts History</h3>
+            </div>
+            <div class="card-body" id="quiz-attempts-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading previous attempts...</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/quiz.js"></script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignments - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Assignments</span>
+        </div>
+
+        <main class="dashboard-content">
+          <div style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">University Assignments</h2>
+            <p class="text-muted" style="font-size: 0.875rem;">Submit course assignments and review instructor feedback</p>
+          </div>
+
+          <div id="assignments-error-area" class="alert alert-danger hidden"></div>
+
+          <div id="assignments-list-container">
+            <div class="loading-container">
+              <div class="spinner-primary"></div>
+              <p>Loading assignments from backend...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Student Assignment Submission Modal -->
+    <div class="modal-overlay" id="submit-assignment-modal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-assignment-title">Submit Assignment</h3>
+          <button class="modal-close" onclick="window.common.closeModal('submit-assignment-modal')">&times;</button>
+        </div>
+        <form id="assignment-submission-form">
+          <div class="modal-body">
+            <div class="alert alert-info" id="modal-deadline-notice" style="margin-bottom: 1rem;">
+              <span>Deadline: <strong id="modal-deadline-text">-</strong></span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="submission-content">Written Answer / Solution</label>
+              <textarea
+                id="submission-content"
+                class="form-textarea"
+                rows="6"
+                placeholder="Enter your completed assignment response, source code explanation, or project link..."
+                required
+              ></textarea>
+              <p class="form-help">Simple text submission as supported by your Spring Boot backend.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('submit-assignment-modal')">Cancel</button>
+            <button type="submit" id="submit-answer-btn" class="btn btn-primary">
+              Submit to Instructor
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/assignments.js"></script>
+  </body>
+</html>

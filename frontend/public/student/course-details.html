@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Details - Smart LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Course Details</span>
+        </div>
+
+        <main class="dashboard-content">
+          <div style="margin-bottom: 1.5rem;">
+            <a href="/student/courses.html" class="text-muted" style="font-size: 0.85rem;">← Back to Courses</a>
+          </div>
+
+          <div id="details-error-area" class="alert alert-danger hidden"></div>
+
+          <div id="course-details-wrapper">
+            <div class="loading-container">
+              <div class="spinner-primary"></div>
+              <p>Loading course curriculum from backend...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/course-details.js"></script>
+  </body>
+</html>
