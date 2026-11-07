@@ -51,13 +51,23 @@ public class AuthService {
                 passwordEncoder.encode(request.getPassword()),
                 Role.STUDENT
         );
-        user.setApprovalStatus(ApprovalStatus.APPROVED);
-        user.setActive(true);
+        // Student registrations require Admin approval before receiving an active account & ID
+        user.setApprovalStatus(ApprovalStatus.PENDING);
+        user.setActive(false);
 
         User saved = userRepository.save(user);
 
-        String token = jwtUtils.generateToken(saved.getEmail(), saved.getRole().name());
-        return new AuthResponse(token, saved.getId(), saved.getName(), saved.getEmail(), saved.getRole().name());
+        // Pending accounts do NOT receive an active token until approved by Admin
+        return new AuthResponse(
+                null,
+                saved.getId(),
+                saved.getName(),
+                saved.getEmail(),
+                saved.getRole().name(),
+                null,
+                null,
+                null
+        );
     }
 
     @Transactional
@@ -91,6 +101,9 @@ public class AuthService {
                 saved.getEmail(),
                 saved.getRole().name(),
                 saved.getEmployeeId(),
+                saved.getProfessionalId(),
+                saved.getEnrollmentNumber(),
+                saved.getDepartment(),
                 saved.getApprovalStatus().name(),
                 saved.isActive(),
                 saved.getCreatedAt()
@@ -128,6 +141,11 @@ public class AuthService {
                 saved.getName(),
                 saved.getEmail(),
                 saved.getRole().name(),
+                saved.getEmployeeId(),
+                saved.getProfessionalId(),
+                saved.getEnrollmentNumber(),
+                saved.getDepartment(),
+                saved.getApprovalStatus().name(),
                 saved.isActive(),
                 saved.getCreatedAt()
         );
@@ -160,6 +178,11 @@ public class AuthService {
                 saved.getName(),
                 saved.getEmail(),
                 saved.getRole().name(),
+                saved.getEmployeeId(),
+                saved.getProfessionalId(),
+                saved.getEnrollmentNumber(),
+                saved.getDepartment(),
+                saved.getApprovalStatus().name(),
                 saved.isActive(),
                 saved.getCreatedAt()
         );
@@ -173,22 +196,40 @@ public class AuthService {
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        // Check teacher approval status before allowing access
-        if (user.getRole() == Role.TEACHER) {
-            if (user.getApprovalStatus() == ApprovalStatus.PENDING) {
-                throw new UnauthorizedException("Your teacher registration is pending approval by an administrator.");
-            }
-            if (user.getApprovalStatus() == ApprovalStatus.REJECTED) {
-                throw new UnauthorizedException("Your teacher registration has been rejected. Please contact administration.");
-            }
+        // Check approval status before allowing access (for Teachers and Students)
+        if (user.getApprovalStatus() == ApprovalStatus.PENDING) {
+            String roleName = user.getRole() == Role.TEACHER ? "teacher" : "student";
+            throw new UnauthorizedException("Your " + roleName + " registration is pending approval by an administrator.");
+        }
+        if (user.getApprovalStatus() == ApprovalStatus.REJECTED) {
+            String roleName = user.getRole() == Role.TEACHER ? "teacher" : "student";
+            throw new UnauthorizedException("Your " + roleName + " registration has been rejected. Please contact administration.");
         }
 
         if (!user.isActive()) {
             throw new UnauthorizedException("Account has been deactivated. Please contact admin.");
         }
 
-        String token = jwtUtils.generateToken(user.getEmail(), user.getRole().name());
-        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
+        // Generate token bound to the current tokenVersion
+        String token = jwtUtils.generateToken(user.getEmail(), user.getRole().name(), user.getTokenVersion());
+        return new AuthResponse(
+                token,
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole().name(),
+                user.getProfessionalId(),
+                user.getEnrollmentNumber(),
+                user.getEmployeeId()
+        );
+    }
+
+    @Transactional
+    public void logout(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            user.setTokenVersion(user.getTokenVersion() + 1);
+            userRepository.save(user);
+        });
     }
 
     public User getUserByEmail(String email) {

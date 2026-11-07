@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Administrator Dashboard - Smart LMS</title>
+    <title>Administrator Dashboard - Galgotias LMS</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
@@ -27,11 +27,11 @@
           <div id="admin-error-area" class="alert alert-danger hidden"></div>
 
           <!-- Dynamic Statistics Grid from GET /api/admin/dashboard -->
-          <div class="stats-grid">
+          <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
             <div class="stat-card">
               <div class="stat-icon-wrap stat-icon-blue">👨‍🎓</div>
               <div>
-                <div class="stat-label">Total Enrolled Students</div>
+                <div class="stat-label">Total Students</div>
                 <div class="stat-value tabular-nums" id="stat-admin-students">-</div>
               </div>
             </div>
@@ -41,6 +41,38 @@
               <div>
                 <div class="stat-label">Faculty Teachers</div>
                 <div class="stat-value tabular-nums" id="stat-admin-teachers">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card" style="border-left: 4px solid var(--success);">
+              <div class="stat-icon-wrap" style="background-color: #dcfce7; color: #15803d;">✅</div>
+              <div>
+                <div class="stat-label">Active Accounts</div>
+                <div class="stat-value tabular-nums" id="stat-admin-active" style="color: #15803d;">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card" style="border-left: 4px solid #ef4444;">
+              <div class="stat-icon-wrap" style="background-color: #fee2e2; color: #b91c1c;">🚫</div>
+              <div>
+                <div class="stat-label">Inactive Accounts</div>
+                <div class="stat-value tabular-nums" id="stat-admin-inactive" style="color: #b91c1c;">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card" style="border-left: 4px solid var(--warning);">
+              <div class="stat-icon-wrap" style="background-color: #fef3c7; color: #b45309;">⏳</div>
+              <div>
+                <div class="stat-label">Pending Teachers</div>
+                <div class="stat-value tabular-nums" id="stat-admin-pending-teachers" style="color: #b45309;">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card" style="border-left: 4px solid #3b82f6;">
+              <div class="stat-icon-wrap" style="background-color: #dbeafe; color: #1d4ed8;">👨‍🎓</div>
+              <div>
+                <div class="stat-label">Pending Students</div>
+                <div class="stat-value tabular-nums" id="stat-admin-pending-students" style="color: #1d4ed8;">-</div>
               </div>
             </div>
 
@@ -57,14 +89,6 @@
               <div>
                 <div class="stat-label">Total Enrollments</div>
                 <div class="stat-value tabular-nums" id="stat-admin-enrollments">-</div>
-              </div>
-            </div>
-
-            <div class="stat-card" style="border-left: 4px solid var(--warning);">
-              <div class="stat-icon-wrap" style="background-color: #fef3c7; color: #b45309;">⏳</div>
-              <div>
-                <div class="stat-label">Pending Teacher Approvals</div>
-                <div class="stat-value tabular-nums" id="stat-admin-pending-teachers" style="color: #b45309;">-</div>
               </div>
             </div>
           </div>
@@ -87,6 +111,28 @@
               <div class="loading-container">
                 <div class="spinner-primary"></div>
                 <p>Loading pending teacher applications...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Student Approval Workflow Section -->
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <h3 class="card-title">Pending Student Registrations</h3>
+                <span class="badge badge-warning" id="pending-students-count-badge" style="background: #dbeafe; color: #1d4ed8;">0 Pending</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="btn btn-secondary btn-sm" onclick="loadPendingStudents()" title="Refresh List">
+                  🔄 Refresh
+                </button>
+                <a href="/admin/users.html" class="btn btn-outline btn-sm">User Directory</a>
+              </div>
+            </div>
+            <div class="card-body" id="pending-students-table-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading pending student applications...</p>
               </div>
             </div>
           </div>

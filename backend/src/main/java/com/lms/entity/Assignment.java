@@ -38,6 +38,12 @@ public class Assignment {
     @Column(nullable = false)
     private int maxMarks;
 
+    private String attachmentFileName;
+    private String attachmentOriginalName;
+    private String attachmentType;
+    private Long attachmentSize;
+    private String attachmentPath;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -75,6 +81,21 @@ public class Assignment {
 
     public int getMaxMarks() { return maxMarks; }
     public void setMaxMarks(int maxMarks) { this.maxMarks = maxMarks; }
+
+    public String getAttachmentFileName() { return attachmentFileName; }
+    public void setAttachmentFileName(String attachmentFileName) { this.attachmentFileName = attachmentFileName; }
+
+    public String getAttachmentOriginalName() { return attachmentOriginalName; }
+    public void setAttachmentOriginalName(String attachmentOriginalName) { this.attachmentOriginalName = attachmentOriginalName; }
+
+    public String getAttachmentType() { return attachmentType; }
+    public void setAttachmentType(String attachmentType) { this.attachmentType = attachmentType; }
+
+    public Long getAttachmentSize() { return attachmentSize; }
+    public void setAttachmentSize(Long attachmentSize) { this.attachmentSize = attachmentSize; }
+
+    public String getAttachmentPath() { return attachmentPath; }
+    public void setAttachmentPath(String attachmentPath) { this.attachmentPath = attachmentPath; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

@@ -59,19 +59,25 @@ async function loadQuizzes() {
             <div class="card">
               <div class="card-header" style="background-color: var(--bg-alt);">
                 <div>
-                  <h3 class="card-title">${window.common.escapeHTML(quiz.title || "Quiz")}</h3>
-                  <span class="text-muted" style="font-size: 0.8rem;">${questions.length} Question${questions.length === 1 ? '' : 's'}</span>
+                  <div class="flex items-center gap-2">
+                    <h3 class="card-title">${window.common.escapeHTML(quiz.title || "Quiz")}</h3>
+                    <span class="badge ${quiz.active ? 'badge-success' : 'badge-neutral'}">${quiz.active ? 'Published' : 'Draft'}</span>
+                  </div>
+                  <span class="text-muted" style="font-size: 0.8rem;">${questions.length} Question${questions.length === 1 ? '' : 's'} · Total Marks: ${quiz.totalMarks || 0}</span>
                 </div>
 
                 <div class="flex items-center gap-2">
-                  <button class="btn btn-primary btn-sm" onclick="openAddQuestionModal('${quiz.id}')">
+                  <button class="btn ${quiz.active ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="handleTogglePublish('${quiz.id}', ${quiz.active})">
+                    ${quiz.active ? 'Unpublish' : 'Publish'}
+                  </button>
+                  <button class="btn btn-outline btn-sm" onclick="openAddQuestionModal('${quiz.id}')">
                     + Add Question
                   </button>
                   <button class="btn btn-secondary btn-sm" onclick="openEditQuizModal('${quiz.id}', '${window.common.escapeHTML(quiz.title)}')">
                     Rename
                   </button>
                   <button class="btn btn-danger-outline btn-sm" onclick="handleDeleteQuiz('${quiz.id}', '${window.common.escapeHTML(quiz.title)}')">
-                    Delete Quiz
+                    Delete
                   </button>
                 </div>
               </div>
@@ -85,7 +91,10 @@ async function loadQuizzes() {
                       <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem;">
                         <div class="flex items-center justify-between" style="margin-bottom: 0.5rem;">
                           <strong style="color: var(--dark); font-size: 0.95rem;">Q${idx + 1}. ${window.common.escapeHTML(q.questionText || q.text)}</strong>
-                          <span class="badge badge-neutral">${q.marks || 1} mark${(q.marks || 1) > 1 ? 's' : ''}</span>
+                          <div class="flex items-center gap-2">
+                            <span class="badge badge-neutral">${q.marks || 1} mark${(q.marks || 1) > 1 ? 's' : ''}</span>
+                            <button class="btn btn-danger-outline btn-sm" style="padding: 0.1rem 0.4rem; font-size: 0.75rem;" onclick="handleDeleteQuestion('${q.id}')">✕ Delete</button>
+                          </div>
                         </div>
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
@@ -140,12 +149,81 @@ window.handleDeleteQuiz = function(id, title) {
   });
 };
 
+window.handleTogglePublish = async function(quizId, currentActive) {
+  const action = currentActive ? "unpublish" : "publish";
+  window.common.confirmAction(`Are you sure you want to ${action} this quiz? ${action === 'publish' ? 'Enrolled students will immediately be able to attempt it.' : 'Students will no longer see or attempt it.'}`, async () => {
+    try {
+      await window.api.put(`/api/quizzes/${quizId}/publish`, {});
+      window.common.showToast(`Quiz has been ${action}ed successfully!`, "success");
+      await loadQuizzes();
+    } catch (err) {
+      window.common.showToast(err.message || `Failed to ${action} quiz`, "error");
+    }
+  });
+};
+
+window.handleDeleteQuestion = function(questionId) {
+  window.common.confirmAction("Are you sure you want to delete this question?", async () => {
+    try {
+      await window.api.delete(`/api/quizzes/questions/${questionId}`);
+      window.common.showToast("Question deleted successfully!", "success");
+      await loadQuizzes();
+    } catch (err) {
+      window.common.showToast(err.message || "Failed to delete question", "error");
+    }
+  });
+};
+
+window.handleQuestionTypeChange = function() {
+  const qType = document.getElementById("q-type-select")?.value || "MCQ";
+  const container = document.getElementById("options-inputs-container");
+  if (!container) return;
+
+  if (qType === "TF") {
+    container.innerHTML = `
+      <div class="flex items-center gap-2">
+        <input type="radio" name="correct-option" value="0" checked title="Mark True as correct" />
+        <input type="text" class="form-input q-opt-input" value="True" readonly style="background: var(--bg-alt); font-weight: 600;" />
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="radio" name="correct-option" value="1" title="Mark False as correct" />
+        <input type="text" class="form-input q-opt-input" value="False" readonly style="background: var(--bg-alt); font-weight: 600;" />
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="flex items-center gap-2">
+        <input type="radio" name="correct-option" value="0" checked title="Mark Option 1 as correct" />
+        <input type="text" class="form-input q-opt-input" placeholder="Option 1" required />
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="radio" name="correct-option" value="1" title="Mark Option 2 as correct" />
+        <input type="text" class="form-input q-opt-input" placeholder="Option 2" required />
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="radio" name="correct-option" value="2" title="Mark Option 3 as correct" />
+        <input type="text" class="form-input q-opt-input" placeholder="Option 3" required />
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="radio" name="correct-option" value="3" title="Mark Option 4 as correct" />
+        <input type="text" class="form-input q-opt-input" placeholder="Option 4" required />
+      </div>
+    `;
+  }
+};
+
 window.openAddQuestionModal = function(quizId) {
   activeQuizId = quizId;
   document.getElementById("q-text-input").value = "";
   document.getElementById("q-marks-input").value = "1";
+  const qTypeSelect = document.getElementById("q-type-select");
+  if (qTypeSelect) {
+    qTypeSelect.value = "MCQ";
+    handleQuestionTypeChange();
+  }
   document.querySelectorAll(".q-opt-input").forEach(input => input.value = "");
-  document.querySelector('input[name="correct-option"][value="0"]').checked = true;
+  const firstRadio = document.querySelector('input[name="correct-option"][value="0"]');
+  if (firstRadio) firstRadio.checked = true;
   window.common.openModal("question-modal");
 };
 

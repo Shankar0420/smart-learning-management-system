@@ -125,6 +125,20 @@ public class CourseController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PostMapping(value = "/{id}/assignments/upload", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+    public ResponseEntity<AssignmentResponse> createAssignmentWithAttachment(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("deadline") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime deadline,
+            @RequestParam(value = "maxMarks", defaultValue = "100") int maxMarks,
+            @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        AssignmentResponse response = assignmentService.createAssignmentWithAttachment(id, title, description, deadline, maxMarks, file, userDetails.getUsername());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}/progress")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<CourseProgressResponse> getCourseProgress(@PathVariable Long id,

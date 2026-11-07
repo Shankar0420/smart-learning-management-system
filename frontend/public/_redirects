@@ -1,0 +1,8 @@
+/login              /pages/login.html              200
+/register           /pages/register.html           200
+/register-teacher   /pages/register-teacher.html   200
+/forgot-password    /pages/forgot-password.html    200
+/reset-password     /pages/reset-password.html     200
+/admin              /admin/dashboard.html          200
+/teacher            /teacher/dashboard.html        200
+/student            /student/dashboard.html        200

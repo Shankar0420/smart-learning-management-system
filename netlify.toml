@@ -1,0 +1,64 @@
+# Netlify Configuration for Galgotias LMS Frontend
+
+[build]
+  base = "frontend"
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[redirects]]
+  from = "/login"
+  to = "/pages/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/pages/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/register-teacher"
+  to = "/pages/register-teacher.html"
+  status = 200
+
+[[redirects]]
+  from = "/forgot-password"
+  to = "/pages/forgot-password.html"
+  status = 200
+
+[[redirects]]
+  from = "/reset-password"
+  to = "/pages/reset-password.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/teacher"
+  to = "/teacher/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/student"
+  to = "/student/dashboard.html"
+  status = 200

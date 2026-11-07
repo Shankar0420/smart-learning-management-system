@@ -8,6 +8,7 @@ let courseId = null;
 let currentLessonId = null;
 let courseData = null;
 let progressData = null;
+let materialsData = [];
 let completedLessonIds = new Set();
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -41,21 +42,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadLearningContent() {
   try {
-    const [course, progress] = await Promise.all([
+    const [course, progress, materials] = await Promise.all([
       window.api.get(`/api/courses/${courseId}`),
       window.api.get(`/api/courses/${courseId}/progress`).catch(err => {
         console.warn("Could not load course progress:", err);
         return { completedLessons: 0, totalLessons: 0, percentage: 0 };
-      })
+      }),
+      window.api.get(`/api/courses/${courseId}/materials`).catch(() => [])
     ]);
 
     courseData = course;
     progressData = progress;
+    materialsData = Array.isArray(materials) ? materials : [];
 
     document.getElementById("learning-course-title").innerText = course.title || "Course Classroom";
 
     updateProgressBar(progress);
     renderModulesTree();
+    renderMaterialsList();
 
     // Select either the requested lesson or the first available lesson
     const firstLesson = findLesson(currentLessonId) || findFirstLesson();
@@ -218,5 +222,51 @@ window.markLessonComplete = async function(lessonId, buttonEl) {
     window.common.showToast(error.message || "Failed to mark lesson complete", "error");
     buttonEl.disabled = false;
     buttonEl.innerText = "Mark as Completed";
+  }
+};
+
+function renderMaterialsList() {
+  const container = document.getElementById("learning-materials-list");
+  if (!container) return;
+
+  if (materialsData.length === 0) {
+    container.innerHTML = `<p class="text-muted" style="padding: 0.5rem; text-align: center; font-size: 0.8rem; margin: 0;">No study materials uploaded for this course yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = materialsData.map(m => {
+    const fileType = (m.fileType || "").toUpperCase();
+    let badgeClass = "badge-info";
+    if (fileType === "PDF") badgeClass = "badge-danger";
+    else if (fileType === "PPT" || fileType === "PPTX") badgeClass = "badge-warning";
+
+    const sizeKB = Math.round((m.fileSize || 0) / 1024);
+    const sizeStr = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + " MB" : sizeKB + " KB";
+
+    return `
+      <div style="padding: 0.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+        <div style="min-width: 0; flex: 1;">
+          <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.15rem;">
+            <span class="badge ${badgeClass}" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">${fileType || "DOC"}</span>
+            <span style="font-size: 0.825rem; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;" title="${window.common.escapeHTML(m.title)}">
+              ${window.common.escapeHTML(m.title)}
+            </span>
+          </div>
+          <span class="text-muted" style="font-size: 0.7rem;">${sizeStr}</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Download material" onclick="handleDownloadMaterial('${m.id}', '${window.common.escapeHTML(m.originalFileName || 'material')}')">
+          ⬇
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+window.handleDownloadMaterial = async function(materialId, filename) {
+  try {
+    window.common.showToast("Downloading material...", "info");
+    await window.api.download(`/api/materials/${materialId}/download`, filename);
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to download material", "error");
   }
 };

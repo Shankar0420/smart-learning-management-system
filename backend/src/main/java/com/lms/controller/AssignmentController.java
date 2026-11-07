@@ -58,6 +58,50 @@ public class AssignmentController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping(value = "/{id}/submit-file", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<AssignmentSubmissionResponse> submitAssignmentWithFile(
+            @PathVariable Long id,
+            @RequestParam(value = "answerText", required = false) String answerText,
+            @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        AssignmentSubmissionResponse response = assignmentService.submitAssignmentWithFile(id, answerText, file, userDetails.getUsername());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/my-submission")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<AssignmentSubmissionResponse> getMySubmission(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        AssignmentSubmissionResponse response = assignmentService.getMySubmission(id, userDetails.getUsername());
+        return response != null ? ResponseEntity.ok(response) : ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/attachment")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadAttachment(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        com.lms.entity.Assignment assignment = assignmentService.getAssignmentEntity(id);
+        org.springframework.core.io.Resource resource = assignmentService.loadAssignmentAttachment(id, userDetails.getUsername());
+        String filename = assignment.getAttachmentOriginalName() != null ? assignment.getAttachmentOriginalName() : "attachment";
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(resource);
+    }
+
+    @GetMapping("/submissions/{id}/file")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadSubmissionFile(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        com.lms.entity.AssignmentSubmission sub = assignmentService.getSubmissionEntity(id);
+        org.springframework.core.io.Resource resource = assignmentService.loadSubmissionFile(id, userDetails.getUsername());
+        String filename = sub.getSubmissionOriginalName() != null ? sub.getSubmissionOriginalName() : "submission";
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(resource);
+    }
+
     @GetMapping("/{id}/submissions")
     @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
     public ResponseEntity<List<AssignmentSubmissionResponse>> getSubmissions(@PathVariable Long id,

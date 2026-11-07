@@ -27,6 +27,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const status = user.status || "ACTIVE";
     const created = user.createdAt || user.createdDate;
 
+    const profId = user.professionalId || "Assigned on Approval";
+    const enrollment = user.enrollmentNumber || user.department || "Standard Admission";
+
+    const studentIdEl = document.getElementById("profile-student-id");
+    if (studentIdEl) studentIdEl.innerText = profId;
+
+    const enrollmentEl = document.getElementById("profile-enrollment-number");
+    if (enrollmentEl) enrollmentEl.innerText = enrollment;
+
     document.getElementById("profile-name").innerText = name;
     document.getElementById("profile-email").innerText = email;
     document.getElementById("profile-role").innerText = role;

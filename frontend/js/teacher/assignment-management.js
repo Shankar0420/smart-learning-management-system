@@ -119,6 +119,11 @@ function renderAssignmentsList() {
               <div class="flex items-center gap-6 text-muted" style="font-size: 0.85rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); flex-wrap: wrap;">
                 <span>📅 Deadline: <strong class="text-primary">${window.common.formatDate(deadline)}</strong></span>
                 <span>💯 Maximum Marks: <strong>${maxMarks}</strong></span>
+                ${a.hasAttachment ? `
+                  <button class="btn btn-outline btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" onclick="handleDownloadAssignmentDoc('${id}', '${window.common.escapeHTML(a.attachmentOriginalName || 'attachment')}')">
+                    📎 Download Specs (${window.common.escapeHTML(a.attachmentOriginalName || 'file')})
+                  </button>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -197,9 +202,22 @@ function setupAssignmentForm() {
     };
 
     try {
+      const fileInput = document.getElementById("assign-file-input");
+      const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
       if (activeAssignmentId) {
         await window.api.put(`/api/assignments/${activeAssignmentId}`, payload);
         window.common.showToast("Assignment updated successfully!", "success");
+      } else if (hasFile) {
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("deadline", new Date(deadline).toISOString().slice(0, 19));
+        formData.append("maxMarks", String(maxMarks));
+        formData.append("file", fileInput.files[0]);
+
+        await window.api.post(`/api/courses/${selectedCourse}/assignments/upload`, formData);
+        window.common.showToast("Assignment with supporting document created successfully!", "success");
       } else {
         await window.api.post(`/api/courses/${selectedCourse}/assignments`, payload);
         window.common.showToast("Assignment created successfully!", "success");
@@ -214,3 +232,11 @@ function setupAssignmentForm() {
     }
   });
 }
+
+window.handleDownloadAssignmentDoc = async function(assignmentId, filename) {
+  try {
+    await window.api.download(`/api/assignments/${assignmentId}/attachment`, filename);
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to download assignment document", "error");
+  }
+};

@@ -15,10 +15,21 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL,
     employee_id VARCHAR(50) UNIQUE,
+    professional_id VARCHAR(50) UNIQUE,
+    enrollment_number VARCHAR(50),
+    department VARCHAR(100),
     approval_status VARCHAR(20) NOT NULL DEFAULT 'APPROVED',
     active BOOLEAN NOT NULL DEFAULT TRUE,
+    token_version INT NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL,
     updated_at DATETIME
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 1b. Atomic Sequence Counter table for Concurrency-Safe ID Generation
+CREATE TABLE IF NOT EXISTS id_sequences (
+    id VARCHAR(50) PRIMARY KEY,
+    current_val BIGINT NOT NULL DEFAULT 0,
+    updated_at DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -123,6 +134,11 @@ CREATE TABLE IF NOT EXISTS assignments (
     course_id BIGINT NOT NULL,
     deadline DATETIME NOT NULL,
     max_marks INT NOT NULL DEFAULT 100,
+    attachment_file_name VARCHAR(255),
+    attachment_original_name VARCHAR(255),
+    attachment_type VARCHAR(50),
+    attachment_size BIGINT,
+    attachment_path VARCHAR(500),
     created_at DATETIME NOT NULL,
     updated_at DATETIME,
     CONSTRAINT fk_assignment_course FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
@@ -133,7 +149,12 @@ CREATE TABLE IF NOT EXISTS assignment_submissions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     assignment_id BIGINT NOT NULL,
     student_id BIGINT NOT NULL,
-    answer_text TEXT NOT NULL,
+    answer_text TEXT,
+    submission_file_name VARCHAR(255),
+    submission_original_name VARCHAR(255),
+    submission_file_type VARCHAR(50),
+    submission_file_size BIGINT,
+    submission_file_path VARCHAR(500),
     marks_obtained INT,
     feedback VARCHAR(1000),
     graded BOOLEAN NOT NULL DEFAULT FALSE,
@@ -169,4 +190,34 @@ CREATE TABLE IF NOT EXISTS lesson_progress (
     CONSTRAINT uk_student_lesson UNIQUE (student_id, lesson_id),
     CONSTRAINT fk_progress_student FOREIGN KEY (student_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_progress_lesson FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 14. Study Materials table (PPT, PPTX, PDF)
+CREATE TABLE IF NOT EXISTS study_materials (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    description VARCHAR(1000),
+    course_id BIGINT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    original_file_name VARCHAR(255) NOT NULL,
+    content_type VARCHAR(100),
+    file_size BIGINT NOT NULL DEFAULT 0,
+    file_type VARCHAR(20) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    uploaded_by BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
+    CONSTRAINT fk_materials_course FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
+    CONSTRAINT fk_materials_teacher FOREIGN KEY (uploaded_by) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 15. Password Reset Tokens table
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL,
+    expiry_date DATETIME NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL,
+    CONSTRAINT fk_reset_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX idx_reset_token (token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

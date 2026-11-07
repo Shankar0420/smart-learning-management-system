@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In - Smart Learning Management System</title>
+    <title>Sign In - Galgotias LMS</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/auth.css" />
@@ -14,8 +14,8 @@
       <!-- Left Academic Brand Panel -->
       <div class="auth-brand-panel">
         <div class="auth-brand-header">
-          <div class="university-badge">Galgotias University · Java Project</div>
-          <h1 class="auth-brand-title">Smart Learning Management System</h1>
+          <div class="university-badge">Galgotias University</div>
+          <h1 class="auth-brand-title">Galgotias LMS</h1>
           <p class="auth-brand-desc">
             Access your course materials, interactive lesson modules, quizzes, and university assignments through a centralized academic portal.
           </p>
@@ -89,7 +89,10 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label required" for="password">Password</label>
+              <div class="flex items-center justify-between" style="margin-bottom: 0.35rem;">
+                <label class="form-label required" for="password" style="margin-bottom: 0;">Password</label>
+                <a href="/pages/forgot-password.html" style="font-size: 0.8rem; color: var(--primary); text-decoration: none;">Forgot password?</a>
+              </div>
               <input
                 type="password"
                 id="password"
@@ -111,7 +114,7 @@
           <div class="auth-footer-links">
             <p>Don't have an account yet? <a href="/pages/register.html">Register as Student</a></p>
             <p style="margin-top: 0.5rem;">Faculty member? <a href="/pages/register-teacher.html" style="font-weight: 600; color: #166534;">Register as Teacher</a></p>
-            <p style="margin-top: 0.5rem;"><a href="/pages/login.html?role=ADMIN">Administrator Sign In</a> · <a href="/pages/register-admin.html" style="font-weight: 600; color: #6b21a8;">Register as Admin</a></p>
+            <p style="margin-top: 0.5rem;"><a href="/pages/login.html?role=ADMIN">Administrator Sign In</a></p>
           </div>
 
         </div>
@@ -155,6 +158,10 @@
           const alert = document.getElementById("login-error-alert");
           document.getElementById("login-error-text").innerText = "Your session has expired. Please sign in again.";
           alert.classList.remove("hidden");
+        } else if (urlParams.get("pending") === "true") {
+          window.common.showToast("Registration submitted! Your account is pending administrator approval before you can sign in.", "info", 8000);
+        } else if (urlParams.get("reset") === "true") {
+          window.common.showToast("Password updated successfully! Please sign in with your new password.", "success", 6000);
         } else if (urlParams.get("registered") === "true") {
           window.common.showToast("Registration successful! Please sign in with your credentials.", "success", 5000);
         }
@@ -266,7 +273,7 @@
           }
           if (footerLinks) {
             footerLinks.innerHTML = `
-              <p>Need an administrator account? <a href="/pages/register-admin.html" style="font-weight: 600; color: #6b21a8;">Register as Admin</a></p>
+              <p class="text-muted" style="font-size: 0.8125rem;">Administrator accounts are managed centrally by the university system.</p>
               <p style="margin-top: 0.5rem;"><a href="/pages/login.html?role=STUDENT">Student Sign In</a> · <a href="/pages/login.html?role=TEACHER">Teacher Sign In</a></p>
             `;
           }

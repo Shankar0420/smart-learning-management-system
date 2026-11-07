@@ -10,6 +10,10 @@ public class AssignmentSubmissionResponse {
     private Long studentId;
     private String studentName;
     private String answerText;
+    private String submissionOriginalName;
+    private String submissionFileType;
+    private Long submissionFileSize;
+    private boolean hasSubmissionFile;
     private Integer marksObtained;
     private Integer maxMarks;
     private String feedback;
@@ -36,6 +40,18 @@ public class AssignmentSubmissionResponse {
 
     public String getAnswerText() { return answerText; }
     public void setAnswerText(String answerText) { this.answerText = answerText; }
+
+    public String getSubmissionOriginalName() { return submissionOriginalName; }
+    public void setSubmissionOriginalName(String submissionOriginalName) { this.submissionOriginalName = submissionOriginalName; }
+
+    public String getSubmissionFileType() { return submissionFileType; }
+    public void setSubmissionFileType(String submissionFileType) { this.submissionFileType = submissionFileType; }
+
+    public Long getSubmissionFileSize() { return submissionFileSize; }
+    public void setSubmissionFileSize(Long submissionFileSize) { this.submissionFileSize = submissionFileSize; }
+
+    public boolean isHasSubmissionFile() { return hasSubmissionFile; }
+    public void setHasSubmissionFile(boolean hasSubmissionFile) { this.hasSubmissionFile = hasSubmissionFile; }
 
     public Integer getMarksObtained() { return marksObtained; }
     public void setMarksObtained(Integer marksObtained) { this.marksObtained = marksObtained; }

@@ -28,9 +28,11 @@ public class AdminRegisterRequest {
     @NotBlank(message = "Administrator registration key is required")
     private String registrationKey;
 
-    public AdminRegisterRequest() {}
+    public AdminRegisterRequest() {
+    }
 
-    public AdminRegisterRequest(String name, String email, String password, String confirmPassword, String registrationKey) {
+    public AdminRegisterRequest(String name, String email, String password, String confirmPassword,
+            String registrationKey) {
         this.name = name;
         this.email = email;
         this.password = password;

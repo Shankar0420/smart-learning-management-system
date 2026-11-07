@@ -5,30 +5,35 @@
  */
 
 :root {
-  /* Brand Colors */
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
-  --primary-border: #bfdbfe;
+  /* Galgotias LMS Brand Colors: Professional Navy Blue, Subtle Grey & White */
+  --primary: #1e3a8a;
+  --primary-hover: #172554;
+  --primary-dark: #0f172a;
+  --primary-light: #f0f4fc;
+  --primary-border: #cbd5e1;
 
-  /* Neutrals */
-  --dark: #1e293b;
-  --dark-accent: #0f172a;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
+  /* Neutrals & Surfaces */
+  --dark: #0f172a;
+  --dark-accent: #090d16;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
   --bg-page: #f8fafc;
   --bg-card: #ffffff;
   --bg-alt: #f1f5f9;
   --border-color: #e2e8f0;
-  --border-light: #f1f5f9;
+  --border-light: #f8fafc;
+
+  /* Accent Prestige Gold */
+  --accent-gold: #d97706;
+  --accent-gold-light: #fef3c7;
 
   /* Feedback Colors */
   --success: #16a34a;
   --success-bg: #f0fdf4;
   --success-border: #bbf7d0;
 
-  --warning: #f59e0b;
+  --warning: #d97706;
   --warning-bg: #fffbeb;
   --warning-border: #fde68a;
 
@@ -36,7 +41,7 @@
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
 
-  --info: #0284c7;
+  --info: #0369a1;
   --info-bg: #f0f9ff;
   --info-border: #bae6fd;
 

@@ -4,10 +4,15 @@ import com.lms.dto.AuthResponse;
 import com.lms.dto.LoginRequest;
 import com.lms.dto.MessageResponse;
 import com.lms.dto.RegisterRequest;
+import com.lms.dto.TeacherRegisterRequest;
+import com.lms.dto.AdminRegisterRequest;
+import com.lms.dto.UserResponse;
 import com.lms.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,9 +20,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final com.lms.service.PasswordResetService passwordResetService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, com.lms.service.PasswordResetService passwordResetService) {
         this.authService = authService;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/register")
@@ -27,17 +34,16 @@ public class AuthController {
     }
 
     @PostMapping("/register-teacher")
-    public ResponseEntity<com.lms.dto.UserResponse> registerTeacher(@Valid @RequestBody com.lms.dto.TeacherRegisterRequest request) {
-        com.lms.dto.UserResponse response = authService.registerTeacher(request);
+    public ResponseEntity<UserResponse> registerTeacher(@Valid @RequestBody TeacherRegisterRequest request) {
+        UserResponse response = authService.registerTeacher(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/register-admin")
-    public ResponseEntity<com.lms.dto.UserResponse> registerAdmin(@Valid @RequestBody com.lms.dto.AdminRegisterRequest request) {
-        com.lms.dto.UserResponse response = authService.registerAdmin(request);
+    public ResponseEntity<UserResponse> registerAdmin(@Valid @RequestBody AdminRegisterRequest request) {
+        UserResponse response = authService.registerAdmin(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -46,7 +52,26 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<MessageResponse> logout() {
+    public ResponseEntity<MessageResponse> logout(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails != null) {
+            authService.logout(userDetails.getUsername());
+        }
         return ResponseEntity.ok(new MessageResponse("Logged out successfully"));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody com.lms.dto.ForgotPasswordRequest request) {
+        return ResponseEntity.ok(passwordResetService.initiatePasswordReset(request.getEmail()));
+    }
+
+    @GetMapping("/verify-reset-token")
+    public ResponseEntity<java.util.Map<String, Boolean>> verifyResetToken(@RequestParam("token") String token) {
+        boolean valid = passwordResetService.verifyToken(token);
+        return ResponseEntity.ok(java.util.Collections.singletonMap("valid", valid));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<MessageResponse> resetPassword(@Valid @RequestBody com.lms.dto.ResetPasswordRequest request) {
+        return ResponseEntity.ok(passwordResetService.resetPassword(request));
     }
 }

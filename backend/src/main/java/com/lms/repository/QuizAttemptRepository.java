@@ -17,6 +17,9 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
     List<QuizAttempt> findByStudentId(Long studentId);
 
     @EntityGraph(attributePaths = {"student", "quiz"})
+    List<QuizAttempt> findByStudentIdOrderByAttemptedAtDesc(Long studentId);
+
+    @EntityGraph(attributePaths = {"student", "quiz"})
     List<QuizAttempt> findAll();
 
     boolean existsByQuizIdAndStudentId(Long quizId, Long studentId);
