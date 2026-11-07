@@ -33,7 +33,10 @@
                 <button id="filter-admins" class="btn btn-sm btn-secondary" style="color: #6b21a8;">Admins</button>
                 <button id="filter-students" class="btn btn-sm btn-secondary">Students</button>
                 <button id="filter-teachers" class="btn btn-sm btn-secondary">Teachers</button>
-                <button id="filter-pending" class="btn btn-sm btn-secondary" style="color: #b45309;">⏳ Pending Teachers</button>
+                <button id="filter-pending-teachers" class="btn btn-sm btn-secondary" style="color: #b45309;">⏳ Pending Teachers</button>
+                <button id="filter-pending-students" class="btn btn-sm btn-secondary" style="color: #1d4ed8;">⏳ Pending Students</button>
+                <button id="filter-active" class="btn btn-sm btn-secondary" style="color: #15803d;">Active</button>
+                <button id="filter-inactive" class="btn btn-sm btn-secondary" style="color: #b91c1c;">Inactive</button>
               </div>
             </div>
           </div>
@@ -42,9 +45,20 @@
           <div id="users-error-area" class="alert alert-danger hidden"></div>
 
           <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Registered Accounts</h3>
-              <span class="badge badge-info" id="users-count-badge">0 Users</span>
+            <div class="card-header flex items-center justify-between flex-wrap gap-3">
+              <div class="flex items-center gap-2">
+                <h3 class="card-title">Registered Accounts</h3>
+                <span class="badge badge-info" id="users-count-badge">0 Users</span>
+              </div>
+              <div class="flex items-center gap-2" style="min-width: 280px;">
+                <input
+                  type="text"
+                  id="users-search-input"
+                  class="form-input"
+                  style="padding: 0.35rem 0.75rem; font-size: 0.875rem;"
+                  placeholder="🔍 Search ID, Name, Email, Dept..."
+                />
+              </div>
             </div>
             <div class="card-body" id="users-table-container" style="padding: 0;">
               <div class="loading-container">
@@ -54,6 +68,25 @@
             </div>
           </div>
         </main>
+      </div>
+    </div>
+
+    <!-- Professional User Profile Modal -->
+    <div class="modal-overlay" id="user-profile-modal">
+      <div class="modal-container" style="max-width: 580px;">
+        <div class="modal-header">
+          <h3 class="modal-title">University Member Profile</h3>
+          <button class="modal-close" onclick="window.common.closeModal('user-profile-modal')">&times;</button>
+        </div>
+        <div class="modal-body" id="user-profile-modal-body">
+          <div class="loading-container">
+            <div class="spinner-primary"></div>
+            <p>Loading profile...</p>
+          </div>
+        </div>
+        <div class="modal-footer" id="user-profile-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('user-profile-modal')">Close</button>
+        </div>
       </div>
     </div>
 

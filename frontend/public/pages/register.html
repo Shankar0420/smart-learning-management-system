@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student Registration - Smart Learning Management System</title>
+    <title>Student Registration - Galgotias LMS</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/auth.css" />
@@ -14,7 +14,7 @@
       <!-- Left Academic Brand Panel -->
       <div class="auth-brand-panel">
         <div class="auth-brand-header">
-          <div class="university-badge">Galgotias University · Java Evaluation Project</div>
+          <div class="university-badge">Galgotias University</div>
           <h1 class="auth-brand-title">Create Your Student Account</h1>
           <p class="auth-brand-desc">
             Register to enroll in university courses, participate in curriculum modules, take graded quizzes, and submit assignments.
@@ -39,7 +39,7 @@
         </div>
 
         <div class="auth-brand-footer">
-          Galgotias University · Smart LMS Client connected to Spring Boot Backend
+          Galgotias University · Galgotias LMS connected to Spring Boot Backend
         </div>
       </div>
 
@@ -124,8 +124,7 @@
           <div class="auth-footer-links">
             <p>Already have an account? <a href="/pages/login.html">Sign In</a></p>
             <p style="margin-top: 0.5rem;">
-              <a href="/pages/register-teacher.html" style="font-weight: 500; color: #166534;">Register as Teacher</a> · 
-              <a href="/pages/register-admin.html" style="font-weight: 500; color: #6b21a8;">Register as Admin</a>
+              <a href="/pages/register-teacher.html" style="font-weight: 500; color: #166534;">Register as Teacher</a>
             </p>
           </div>
 
@@ -214,10 +213,10 @@
               role: "STUDENT"
             });
 
-            window.common.showToast("Account registered successfully! Redirecting to sign in...", "success");
+            window.common.showToast("Registration submitted! Your student account is pending administrator approval.", "success", 6000);
             setTimeout(() => {
-              window.location.href = "/pages/login.html?registered=true";
-            }, 1000);
+              window.location.href = "/pages/login.html?pending=true";
+            }, 1500);
           } catch (err) {
             errorText.innerText = err.message || "Registration failed. Please check the provided information.";
             errorAlert.classList.remove("hidden");

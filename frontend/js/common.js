@@ -185,10 +185,10 @@ function initDashboardLayout(role, activePageKey) {
     sidebarContainer.innerHTML = `
       <aside class="dashboard-sidebar" id="dashboard-sidebar">
         <div class="sidebar-brand">
-          <div class="brand-icon">GU</div>
+          <div class="brand-icon" style="background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 1px solid rgba(255,255,255,0.2);">GU</div>
           <div class="brand-text">
             <h2>Galgotias LMS</h2>
-            <span>Smart LMS Portal</span>
+            <span>Galgotias University Portal</span>
           </div>
         </div>
 
@@ -218,7 +218,7 @@ function initDashboardLayout(role, activePageKey) {
     });
   }
 
-  // Populate Top Header
+  // Populate Top Header with Global Backend Connection Indicator
   const headerContainer = document.getElementById("header-container");
   if (headerContainer) {
     const pageTitle = document.getElementById("page-title-text")?.innerText || "Dashboard";
@@ -236,10 +236,11 @@ function initDashboardLayout(role, activePageKey) {
         </div>
 
         <div class="header-right">
-          <button class="api-badge" id="api-config-btn" title="Click to view or change backend URL">
-            <span class="status-dot connected" id="api-status-dot"></span>
-            <span>API: ${escapeHTML(currentBaseUrl)}</span>
-          </button>
+          <!-- Backend Connection Indicator (Green: connected, Red: unavailable, Yellow: checking) -->
+          <div class="backend-status-indicator checking" id="backend-status-badge" title="Click to view/change backend URL" onclick="window.common.openApiConfigModal()">
+            <span class="status-indicator-dot checking" id="backend-status-dot"></span>
+            <span id="backend-status-text">Checking backend...</span>
+          </div>
           <button class="btn btn-secondary btn-sm" id="top-logout-btn">
             Log Out
           </button>
@@ -251,9 +252,7 @@ function initDashboardLayout(role, activePageKey) {
       window.auth.logout();
     });
 
-    document.getElementById("api-config-btn")?.addEventListener("click", () => {
-      openApiConfigModal();
-    });
+    startBackendHealthMonitor();
   }
 
   // Mobile Drawer Toggle
@@ -332,6 +331,61 @@ function openApiConfigModal() {
   openModal("api-config-modal");
 }
 
+/**
+ * Global Automated Backend Health Monitor
+ * Updates the header status dot:
+ * Green: Backend connected
+ * Yellow: Checking connection
+ * Red: Backend unavailable
+ * Checks on load and periodically without overloading the backend
+ */
+function startBackendHealthMonitor() {
+  const checkHealth = async () => {
+    const dot = document.getElementById("backend-status-dot");
+    const text = document.getElementById("backend-status-text");
+    const badge = document.getElementById("backend-status-badge");
+    if (!dot || !text || !badge) return;
+
+    try {
+      const baseUrl = window.APP_CONFIG.getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/health`, {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+      });
+
+      if (res.ok) {
+        dot.className = "status-indicator-dot connected";
+        badge.className = "backend-status-indicator connected";
+        text.innerText = "Backend connected";
+        badge.title = `Connected to Galgotias LMS Backend (${baseUrl})`;
+      } else {
+        dot.className = "status-indicator-dot disconnected";
+        badge.className = "backend-status-indicator disconnected";
+        text.innerText = "Backend unavailable";
+        badge.title = `Backend returned status ${res.status}`;
+      }
+    } catch (err) {
+      dot.className = "status-indicator-dot disconnected";
+      badge.className = "backend-status-indicator disconnected";
+      text.innerText = "Backend unavailable";
+      badge.title = `Connection error: ${err.message}. Click to configure URL.`;
+    }
+  };
+
+  // Run initial check
+  checkHealth();
+
+  // Periodic poll every 35s, only when tab is visible
+  if (window._backendHealthInterval) {
+    clearInterval(window._backendHealthInterval);
+  }
+  window._backendHealthInterval = setInterval(() => {
+    if (document.visibilityState === "visible") {
+      checkHealth();
+    }
+  }, 35000);
+}
+
 // Global exports
 window.common = {
   showToast,
@@ -344,5 +398,6 @@ window.common = {
   closeModal,
   confirmAction,
   initDashboardLayout,
-  openApiConfigModal
+  openApiConfigModal,
+  startBackendHealthMonitor
 };

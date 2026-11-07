@@ -23,6 +23,7 @@ public class DataInitializer implements CommandLineRunner {
     private final QuizOptionRepository quizOptionRepository;
     private final AssignmentRepository assignmentRepository;
     private final LessonProgressRepository lessonProgressRepository;
+    private final IdSequenceRepository idSequenceRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
@@ -35,6 +36,7 @@ public class DataInitializer implements CommandLineRunner {
                            QuizOptionRepository quizOptionRepository,
                            AssignmentRepository assignmentRepository,
                            LessonProgressRepository lessonProgressRepository,
+                           IdSequenceRepository idSequenceRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
@@ -46,6 +48,7 @@ public class DataInitializer implements CommandLineRunner {
         this.quizOptionRepository = quizOptionRepository;
         this.assignmentRepository = assignmentRepository;
         this.lessonProgressRepository = lessonProgressRepository;
+        this.idSequenceRepository = idSequenceRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -60,14 +63,26 @@ public class DataInitializer implements CommandLineRunner {
         User admin = new User("System Admin", "admin@lms.com", passwordEncoder.encode("admin123"), Role.ADMIN);
         User teacher = new User("Dr. Ramesh Sharma", "teacher@lms.com", passwordEncoder.encode("teacher123"), Role.TEACHER);
         teacher.setEmployeeId("EMP1001");
+        teacher.setProfessionalId("GUL-TEA-2026-001");
+        teacher.setDepartment("School of Computing Science & Engineering");
         teacher.setApprovalStatus(ApprovalStatus.APPROVED);
         User student1 = new User("Aman Kumar", "student1@lms.com", passwordEncoder.encode("student123"), Role.STUDENT);
+        student1.setProfessionalId("GUL-STU-2026-001");
+        student1.setEnrollmentNumber("ENR2026001");
+        student1.setDepartment("Computer Science");
         User student2 = new User("Pooja Verma", "student2@lms.com", passwordEncoder.encode("student123"), Role.STUDENT);
+        student2.setProfessionalId("GUL-STU-2026-002");
+        student2.setEnrollmentNumber("ENR2026002");
+        student2.setDepartment("Information Technology");
 
         userRepository.save(admin);
         teacher = userRepository.save(teacher);
         student1 = userRepository.save(student1);
         student2 = userRepository.save(student2);
+
+        // Seed sequence initial values for 2026
+        idSequenceRepository.save(new IdSequence("TEA_2026", 1L));
+        idSequenceRepository.save(new IdSequence("STU_2026", 2L));
 
 
         // 2. Course 1: Java Programming Masterclass

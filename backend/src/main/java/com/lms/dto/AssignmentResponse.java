@@ -10,6 +10,10 @@ public class AssignmentResponse {
     private Long courseId;
     private LocalDateTime deadline;
     private int maxMarks;
+    private String attachmentOriginalName;
+    private String attachmentType;
+    private Long attachmentSize;
+    private boolean hasAttachment;
     private LocalDateTime createdAt;
 
     public AssignmentResponse() {}
@@ -31,6 +35,18 @@ public class AssignmentResponse {
 
     public int getMaxMarks() { return maxMarks; }
     public void setMaxMarks(int maxMarks) { this.maxMarks = maxMarks; }
+
+    public String getAttachmentOriginalName() { return attachmentOriginalName; }
+    public void setAttachmentOriginalName(String attachmentOriginalName) { this.attachmentOriginalName = attachmentOriginalName; }
+
+    public String getAttachmentType() { return attachmentType; }
+    public void setAttachmentType(String attachmentType) { this.attachmentType = attachmentType; }
+
+    public Long getAttachmentSize() { return attachmentSize; }
+    public void setAttachmentSize(Long attachmentSize) { this.attachmentSize = attachmentSize; }
+
+    public boolean isHasAttachment() { return hasAttachment; }
+    public void setHasAttachment(boolean hasAttachment) { this.hasAttachment = hasAttachment; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

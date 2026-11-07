@@ -24,6 +24,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const email = user.email || "faculty@galgotiasuniversity.edu.in";
     const status = user.status || "ACTIVE";
 
+    const profId = user.professionalId || "Assigned on Approval";
+    const empId = user.employeeId || "N/A";
+
+    const idEl = document.getElementById("teacher-profile-id");
+    if (idEl) idEl.innerText = profId;
+
+    const empEl = document.getElementById("teacher-profile-emp-id");
+    if (empEl) empEl.innerText = empId;
+
     document.getElementById("teacher-profile-name").innerText = name;
     document.getElementById("teacher-profile-email").innerText = email;
     document.getElementById("teacher-profile-status").innerText = status;

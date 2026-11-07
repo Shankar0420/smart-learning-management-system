@@ -79,11 +79,17 @@ function saveAuth(authResponse) {
       name: authResponse.name || authResponse.fullName || authResponse.username || authResponse.email.split("@")[0],
       email: authResponse.email,
       role: (authResponse.role || "STUDENT").toUpperCase(),
+      professionalId: authResponse.professionalId || null,
+      enrollmentNumber: authResponse.enrollmentNumber || null,
+      employeeId: authResponse.employeeId || null,
       status: authResponse.status || "ACTIVE",
       createdAt: authResponse.createdAt || authResponse.createdDate
     };
   } else if (user) {
     user.role = (user.role || "STUDENT").toUpperCase();
+    if (authResponse.professionalId) user.professionalId = authResponse.professionalId;
+    if (authResponse.enrollmentNumber) user.enrollmentNumber = authResponse.enrollmentNumber;
+    if (authResponse.employeeId) user.employeeId = authResponse.employeeId;
   }
 
   if (token) {

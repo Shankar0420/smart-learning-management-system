@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Course Learning - Smart LMS</title>
+    <title>Course Learning - Galgotias LMS</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
@@ -50,15 +50,31 @@
 
           <!-- Learning Split Layout: Modules Accordion + Lesson Viewer -->
           <div class="learning-layout">
-            <!-- Left Modules Tree -->
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title" style="font-size: 1rem;">Modules & Lessons</h3>
+            <!-- Left Sidebar: Modules Tree + Study Materials -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              <!-- Left Modules Tree -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title" style="font-size: 1rem;">Modules & Lessons</h3>
+                </div>
+                <div class="card-body" id="learning-modules-tree" style="padding: 0.75rem;">
+                  <div class="loading-container">
+                    <div class="spinner-primary"></div>
+                    <p>Loading syllabus...</p>
+                  </div>
+                </div>
               </div>
-              <div class="card-body" id="learning-modules-tree" style="padding: 0.75rem;">
-                <div class="loading-container">
-                  <div class="spinner-primary"></div>
-                  <p>Loading syllabus...</p>
+
+              <!-- Left Study Materials List -->
+              <div class="card">
+                <div class="card-header" style="padding: 0.75rem 1rem;">
+                  <h3 class="card-title" style="font-size: 0.95rem;">📑 Study Materials</h3>
+                </div>
+                <div class="card-body" id="learning-materials-list" style="padding: 0.75rem;">
+                  <div class="loading-container" style="padding: 1rem 0;">
+                    <div class="spinner-primary"></div>
+                    <p style="font-size: 0.8rem;">Loading materials...</p>
+                  </div>
                 </div>
               </div>
             </div>

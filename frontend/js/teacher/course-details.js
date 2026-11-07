@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   setupModalForms();
   await loadCurriculum();
+  await loadMaterials();
 });
 
 async function loadCurriculum() {
@@ -235,4 +236,150 @@ function setupModalForms() {
       saveBtn.disabled = false;
     }
   });
+
+  // Material Form
+  const materialForm = document.getElementById("material-form");
+  if (materialForm) {
+    materialForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("material-title-input").value.trim();
+      const desc = document.getElementById("material-desc-input").value.trim();
+      const fileInput = document.getElementById("material-file-input");
+
+      if (!title) {
+        window.common.showToast("Title is required", "error");
+        return;
+      }
+      if (!fileInput.files || fileInput.files.length === 0) {
+        window.common.showToast("Please choose a PPT, PPTX, or PDF file to upload", "error");
+        return;
+      }
+
+      const uploadBtn = document.getElementById("upload-material-btn");
+      uploadBtn.disabled = true;
+      uploadBtn.innerText = "Uploading...";
+
+      try {
+        const formData = new FormData();
+        formData.append("title", title);
+        if (desc) formData.append("description", desc);
+        formData.append("file", fileInput.files[0]);
+
+        await window.api.post(`/api/courses/${courseId}/materials`, formData);
+        window.common.showToast("Study material uploaded successfully!", "success");
+        window.common.closeModal("material-modal");
+        materialForm.reset();
+        await loadMaterials();
+      } catch (err) {
+        window.common.showToast(err.message || "Failed to upload study material", "error");
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.innerText = "Upload Material";
+      }
+    });
+  }
 }
+
+async function loadMaterials() {
+  const container = document.getElementById("materials-container");
+  const countBadge = document.getElementById("materials-count-badge");
+  if (!container) return;
+
+  try {
+    const materials = await window.api.get(`/api/courses/${courseId}/materials`);
+    const list = Array.isArray(materials) ? materials : [];
+    if (countBadge) countBadge.innerText = `${list.length} File${list.length === 1 ? '' : 's'}`;
+
+    if (list.length === 0) {
+      window.common.renderEmptyState(
+        container,
+        "No Study Materials Yet",
+        "Upload presentations and documents (PPT, PPTX, PDF) for students enrolled in this course.",
+        '<button class="btn btn-primary btn-sm" onclick="openUploadMaterialModal()">+ Upload Material</button>'
+      );
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Format</th>
+              <th>Material Title</th>
+              <th>Original File</th>
+              <th>Size</th>
+              <th>Uploaded Date</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map(m => {
+              const fileType = (m.fileType || "PDF").toUpperCase();
+              const badgeClass = fileType.includes("PPT") ? "badge-warning" : "badge-danger";
+              const sizeKB = Math.round((m.fileSize || 0) / 1024);
+              const sizeStr = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + " MB" : sizeKB + " KB";
+
+              return `
+                <tr>
+                  <td>
+                    <span class="badge ${badgeClass}" style="font-weight: 700;">${fileType}</span>
+                  </td>
+                  <td>
+                    <strong>${window.common.escapeHTML(m.title)}</strong>
+                    ${m.description ? `<p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">${window.common.escapeHTML(m.description)}</p>` : ''}
+                  </td>
+                  <td>
+                    <code style="font-size: 0.75rem; background: rgba(37,99,235,0.08); color: var(--primary); padding: 0.1rem 0.35rem; border-radius: 4px;">
+                      ${window.common.escapeHTML(m.originalFileName || "document")}
+                    </code>
+                  </td>
+                  <td class="text-muted tabular-nums">${sizeStr}</td>
+                  <td class="text-muted tabular-nums">${window.common.formatDate(m.createdAt)}</td>
+                  <td style="text-align: right;">
+                    <div class="flex items-center justify-end gap-2">
+                      <button class="btn btn-secondary btn-sm" onclick="handleDownloadMaterial('${m.id}', '${window.common.escapeHTML(m.originalFileName || 'material')}')">
+                        ⬇ Download
+                      </button>
+                      <button class="btn btn-danger-outline btn-sm" onclick="handleDeleteMaterial('${m.id}', '${window.common.escapeHTML(m.title)}')">
+                        ✕ Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } catch (err) {
+    window.common.renderErrorState(container, err.message, () => loadMaterials());
+  }
+}
+
+window.openUploadMaterialModal = function() {
+  const form = document.getElementById("material-form");
+  if (form) form.reset();
+  window.common.openModal("material-modal");
+};
+
+window.handleDownloadMaterial = async function(materialId, filename) {
+  try {
+    await window.api.download(`/api/materials/${materialId}/download`, filename);
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to download material", "error");
+  }
+};
+
+window.handleDeleteMaterial = function(materialId, title) {
+  window.common.confirmAction(`Are you sure you want to delete "${title}"? This cannot be undone.`, async () => {
+    try {
+      await window.api.delete(`/api/materials/${materialId}`);
+      window.common.showToast("Study material deleted successfully!", "success");
+      await loadMaterials();
+    } catch (err) {
+      window.common.showToast(err.message || "Failed to delete study material", "error");
+    }
+  });
+};

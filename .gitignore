@@ -13,3 +13,13 @@ frontend/.DS_Store
 .env
 *.env
 backend/src/main/resources/application.properties
+
+# Local IDE settings
+.vscode/
+
+# Uploaded files
+backend/uploads/
+
+# Build and local files
+*.log
+.DS_Store

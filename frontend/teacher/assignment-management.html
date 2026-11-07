@@ -92,6 +92,12 @@
                 <input type="number" id="assign-marks-input" class="form-input" min="1" max="1000" value="100" required />
               </div>
             </div>
+
+            <div class="form-group">
+              <label class="form-label" for="assign-file-input">Supporting Document / Specs (Optional PDF, PPT, DOC, ZIP)</label>
+              <input type="file" id="assign-file-input" class="form-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.zip" />
+              <p class="form-help">Upload project specifications or problem statements for students.</p>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('assignment-modal')">Cancel</button>

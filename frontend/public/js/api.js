@@ -37,9 +37,14 @@ class ApiService {
     const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
     const url = `${baseUrl}${cleanEndpoint}`;
 
+    const headers = this.getHeaders(options.headers);
+    if (options.body instanceof FormData) {
+      delete headers["Content-Type"];
+    }
+
     const config = {
       method: options.method || "GET",
-      headers: this.getHeaders(options.headers),
+      headers,
       ...options
     };
 
@@ -133,6 +138,42 @@ class ApiService {
 
   delete(endpoint) {
     return this.request(endpoint, { method: "DELETE" });
+  }
+
+  async download(endpoint, defaultFilename = "download") {
+    const baseUrl = window.APP_CONFIG.getApiBaseUrl();
+    const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const url = `${baseUrl}${cleanEndpoint}`;
+    const token = this.getToken();
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      let errMsg = "Failed to download file";
+      try {
+        const errObj = await res.json();
+        errMsg = errObj.message || errMsg;
+      } catch (e) {}
+      throw new Error(errMsg);
+    }
+
+    const disposition = res.headers.get("Content-Disposition");
+    let filename = defaultFilename;
+    if (disposition && disposition.includes("filename=")) {
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      if (match && match[1]) filename = match[1].trim();
+    }
+
+    const blob = await res.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(blobUrl);
   }
 }
 

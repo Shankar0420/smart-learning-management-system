@@ -1,22 +1,21 @@
 package com.lms.controller;
 
 import com.lms.dto.AdminDashboardResponse;
+import com.lms.dto.AdminRegisterRequest;
 import com.lms.dto.CourseResponse;
 import com.lms.dto.UserResponse;
 import com.lms.entity.Role;
+import com.lms.service.AuthService;
 import com.lms.service.CourseService;
 import com.lms.service.DashboardService;
 import com.lms.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import com.lms.dto.AdminRegisterRequest;
-import com.lms.service.AuthService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -44,13 +43,36 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers(@RequestParam(required = false) String q) {
+        if (q != null && !q.trim().isEmpty()) {
+            return ResponseEntity.ok(userService.searchUsers(q));
+        }
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/users/search")
+    public ResponseEntity<List<UserResponse>> searchUsers(@RequestParam("q") String query) {
+        return ResponseEntity.ok(userService.searchUsers(query));
     }
 
     @GetMapping("/students")
     public ResponseEntity<List<UserResponse>> getStudents() {
         return ResponseEntity.ok(userService.getUsersByRole(Role.STUDENT));
+    }
+
+    @GetMapping("/students/pending")
+    public ResponseEntity<List<UserResponse>> getPendingStudents() {
+        return ResponseEntity.ok(userService.getPendingStudents());
+    }
+
+    @PutMapping("/students/{id}/approve")
+    public ResponseEntity<UserResponse> approveStudent(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.approveStudent(id));
+    }
+
+    @PutMapping("/students/{id}/reject")
+    public ResponseEntity<UserResponse> rejectStudent(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.rejectStudent(id));
     }
 
     @GetMapping("/teachers")
@@ -98,5 +120,4 @@ public class AdminController {
     public ResponseEntity<List<CourseResponse>> getAllCourses() {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
-
 }

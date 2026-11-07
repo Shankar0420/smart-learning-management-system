@@ -23,8 +23,14 @@ public class AssignmentSubmission {
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String answerText;
+
+    private String submissionFileName;
+    private String submissionOriginalName;
+    private String submissionFileType;
+    private Long submissionFileSize;
+    private String submissionFilePath;
 
     private Integer marksObtained;
 
@@ -59,6 +65,21 @@ public class AssignmentSubmission {
 
     public String getAnswerText() { return answerText; }
     public void setAnswerText(String answerText) { this.answerText = answerText; }
+
+    public String getSubmissionFileName() { return submissionFileName; }
+    public void setSubmissionFileName(String submissionFileName) { this.submissionFileName = submissionFileName; }
+
+    public String getSubmissionOriginalName() { return submissionOriginalName; }
+    public void setSubmissionOriginalName(String submissionOriginalName) { this.submissionOriginalName = submissionOriginalName; }
+
+    public String getSubmissionFileType() { return submissionFileType; }
+    public void setSubmissionFileType(String submissionFileType) { this.submissionFileType = submissionFileType; }
+
+    public Long getSubmissionFileSize() { return submissionFileSize; }
+    public void setSubmissionFileSize(Long submissionFileSize) { this.submissionFileSize = submissionFileSize; }
+
+    public String getSubmissionFilePath() { return submissionFilePath; }
+    public void setSubmissionFilePath(String submissionFilePath) { this.submissionFilePath = submissionFilePath; }
 
     public Integer getMarksObtained() { return marksObtained; }
     public void setMarksObtained(Integer marksObtained) { this.marksObtained = marksObtained; }

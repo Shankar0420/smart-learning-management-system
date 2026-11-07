@@ -39,12 +39,24 @@ public class User {
     @Column(unique = true)
     private String employeeId;
 
+    @Column(unique = true)
+    private String professionalId;
+
+    @Column
+    private String enrollmentNumber;
+
+    @Column
+    private String department;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApprovalStatus approvalStatus = ApprovalStatus.APPROVED;
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @Column(nullable = false)
+    private int tokenVersion = 1;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -100,6 +112,18 @@ public class User {
 
     public String getEmployeeId() { return employeeId; }
     public void setEmployeeId(String employeeId) { this.employeeId = employeeId; }
+
+    public String getProfessionalId() { return professionalId; }
+    public void setProfessionalId(String professionalId) { this.professionalId = professionalId; }
+
+    public String getEnrollmentNumber() { return enrollmentNumber; }
+    public void setEnrollmentNumber(String enrollmentNumber) { this.enrollmentNumber = enrollmentNumber; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public int getTokenVersion() { return tokenVersion; }
+    public void setTokenVersion(int tokenVersion) { this.tokenVersion = tokenVersion; }
 
     public ApprovalStatus getApprovalStatus() { return approvalStatus; }
     public void setApprovalStatus(ApprovalStatus approvalStatus) { this.approvalStatus = approvalStatus; }

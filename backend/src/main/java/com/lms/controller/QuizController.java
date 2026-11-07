@@ -37,6 +37,13 @@ public class QuizController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{id}/publish")
+    @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+    public ResponseEntity<QuizResponse> togglePublish(@PathVariable Long id,
+                                                      @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(quizService.togglePublishQuiz(id, userDetails.getUsername()));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> deleteQuiz(@PathVariable Long id,
@@ -52,6 +59,14 @@ public class QuizController {
                                                             @AuthenticationPrincipal UserDetails userDetails) {
         QuizQuestionResponse response = quizService.addQuestion(id, request, userDetails.getUsername());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/questions/{questionId}")
+    @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+    public ResponseEntity<MessageResponse> deleteQuestion(@PathVariable Long questionId,
+                                                          @AuthenticationPrincipal UserDetails userDetails) {
+        quizService.deleteQuestion(questionId, userDetails.getUsername());
+        return ResponseEntity.ok(new MessageResponse("Question deleted successfully"));
     }
 
     @PostMapping("/{id}/submit")

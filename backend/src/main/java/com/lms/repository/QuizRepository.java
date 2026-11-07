@@ -10,4 +10,6 @@ import java.util.List;
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     List<Quiz> findByCourseId(Long courseId);
+
+    long countByCourseIdIn(List<Long> courseIds);
 }

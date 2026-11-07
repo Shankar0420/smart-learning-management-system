@@ -83,6 +83,14 @@
         <form id="question-form">
           <div class="modal-body">
             <div class="form-group">
+              <label class="form-label required" for="q-type-select">Question Format</label>
+              <select id="q-type-select" class="form-select" onchange="handleQuestionTypeChange()">
+                <option value="MCQ" selected>Multiple Choice (4 Options)</option>
+                <option value="TF">True / False (2 Options)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
               <label class="form-label required" for="q-text-input">Question Statement</label>
               <textarea
                 id="q-text-input"

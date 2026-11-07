@@ -82,8 +82,8 @@ public class AuthIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(register)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.token").isNotEmpty())
                 .andExpect(jsonPath("$.role").value("STUDENT"))
+                .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.password").doesNotExist());
     }
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Assignments - Smart LMS</title>
+    <title>Assignments - Galgotias LMS</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
@@ -49,16 +49,35 @@
               <span>Deadline: <strong id="modal-deadline-text">-</strong></span>
             </div>
 
+            <div id="modal-attachment-container" class="alert alert-neutral hidden" style="margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+              <span id="modal-attachment-text">📎 Supporting Document attached</span>
+              <button type="button" id="modal-attachment-dl-btn" class="btn btn-secondary btn-sm">Download Specs</button>
+            </div>
+
+            <div class="form-group" id="submission-file-group">
+              <label class="form-label" for="submission-file">Upload Solution Document (Optional if text is provided)</label>
+              <input
+                type="file"
+                id="submission-file"
+                class="form-input"
+                accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.zip"
+              />
+              <p class="form-help">Supported formats: PDF, PPT, PPTX, DOC, DOCX, TXT, ZIP (Max 50MB).</p>
+            </div>
+
+            <div id="modal-submitted-file-area" class="alert alert-success hidden" style="margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+              <span id="modal-submitted-file-name">📄 Submitted File</span>
+              <button type="button" id="modal-submitted-file-dl-btn" class="btn btn-secondary btn-sm">⬇ Download Submission</button>
+            </div>
+
             <div class="form-group">
-              <label class="form-label required" for="submission-content">Written Answer / Solution</label>
+              <label class="form-label" for="submission-content">Written Answer / Comments (Optional if file is attached)</label>
               <textarea
                 id="submission-content"
                 class="form-textarea"
-                rows="6"
-                placeholder="Enter your completed assignment response, source code explanation, or project link..."
-                required
+                rows="5"
+                placeholder="Enter your completed assignment response, solution text, or notes for your instructor..."
               ></textarea>
-              <p class="form-help">Simple text submission as supported by your Spring Boot backend.</p>
             </div>
           </div>
           <div class="modal-footer">

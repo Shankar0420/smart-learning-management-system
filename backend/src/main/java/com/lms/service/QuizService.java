@@ -42,7 +42,11 @@ public class QuizService {
 
     public List<QuizResponse> getQuizzesByCourseId(Long courseId, String userEmail) {
         enrollmentService.checkStudentEnrollmentOrTeacherAdmin(courseId, userEmail);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
+        boolean isTeacherOrAdmin = user.getRole() == Role.TEACHER || user.getRole() == Role.ADMIN;
         return quizRepository.findByCourseId(courseId).stream()
+                .filter(q -> isTeacherOrAdmin || q.isActive())
                 .map(q -> mapToResponse(q, false))
                 .collect(Collectors.toList());
     }
@@ -182,6 +186,46 @@ public class QuizService {
     }
 
     @Transactional
+    public QuizResponse togglePublishQuiz(Long quizId, String teacherEmail) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id: " + quizId));
+
+        User user = userRepository.findByEmail(teacherEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + teacherEmail));
+
+        if (user.getRole() != Role.ADMIN && !quiz.getCourse().getTeacher().getId().equals(user.getId())) {
+            throw new ForbiddenException("Only the course teacher can publish or unpublish this quiz");
+        }
+
+        quiz.setActive(!quiz.isActive());
+        Quiz saved = quizRepository.save(quiz);
+        return mapToResponse(saved, true);
+    }
+
+    @Transactional
+    public void deleteQuestion(Long questionId, String teacherEmail) {
+        QuizQuestion question = quizQuestionRepository.findById(questionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found with id: " + questionId));
+
+        Quiz quiz = question.getQuiz();
+        User user = userRepository.findByEmail(teacherEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + teacherEmail));
+
+        if (user.getRole() != Role.ADMIN && !quiz.getCourse().getTeacher().getId().equals(user.getId())) {
+            throw new ForbiddenException("Only the course teacher can delete questions from this quiz");
+        }
+
+        quizOptionRepository.deleteAll(quizOptionRepository.findByQuestionId(questionId));
+        quizQuestionRepository.delete(question);
+
+        int totalMarks = quizQuestionRepository.findByQuizId(quiz.getId()).stream()
+                .mapToInt(QuizQuestion::getMarks)
+                .sum();
+        quiz.setTotalMarks(totalMarks);
+        quizRepository.save(quiz);
+    }
+
+    @Transactional
     public QuizAttemptResponse submitQuiz(Long quizId, QuizSubmitRequest request, String studentEmail) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id: " + quizId));
@@ -195,6 +239,10 @@ public class QuizService {
 
         if (!enrollmentService.isStudentEnrolled(student.getId(), quiz.getCourse().getId())) {
             throw new ForbiddenException("You must be enrolled in the course to submit this quiz");
+        }
+
+        if (!quiz.isActive()) {
+            throw new BadRequestException("This quiz is not currently published for student attempts");
         }
 
         // Server-side Score Calculation: NEVER trust frontend score

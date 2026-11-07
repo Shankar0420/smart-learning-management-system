@@ -109,8 +109,15 @@ async function loadSubmissions(targetAssignmentId) {
               return `
                 <tr>
                   <td><strong>${window.common.escapeHTML(studentName)}</strong></td>
-                  <td class="text-muted" style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    ${window.common.escapeHTML(content)}
+                  <td class="text-muted" style="max-width: 250px;">
+                    <div>${window.common.escapeHTML(content)}</div>
+                    ${sub.hasSubmissionFile ? `
+                      <div style="margin-top: 0.35rem;">
+                        <button class="btn btn-secondary btn-sm" style="padding: 0.15rem 0.5rem; font-size: 0.75rem;" onclick="handleDownloadSubmissionFile('${sub.id}', '${window.common.escapeHTML(sub.submissionOriginalName || 'file')}')">
+                          ⬇ ${window.common.escapeHTML(sub.submissionOriginalName || 'Attached File')}
+                        </button>
+                      </div>
+                    ` : ''}
                   </td>
                   <td class="text-muted tabular-nums">${window.common.formatDate(sub.submittedAt || sub.createdAt)}</td>
                   <td>
@@ -148,7 +155,20 @@ window.openGradeModal = function(sub) {
 
   document.getElementById("grade-modal-student").innerText = studentName;
   document.getElementById("grade-modal-submitted-at").innerText = window.common.formatDate(sub.submittedAt || sub.createdAt);
-  document.getElementById("grade-modal-content").innerText = content;
+  let contentHtml = window.common.escapeHTML(content);
+  if (sub.hasSubmissionFile) {
+    contentHtml += `
+      <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
+        <strong style="font-size: 0.8rem; color: var(--dark);">Uploaded Solution File:</strong>
+        <div style="margin-top: 0.25rem;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="handleDownloadSubmissionFile('${sub.id}', '${window.common.escapeHTML(sub.submissionOriginalName || 'file')}')">
+            ⬇ Download Attached File (${window.common.escapeHTML(sub.submissionOriginalName || 'file')})
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById("grade-modal-content").innerHTML = contentHtml;
   document.getElementById("grade-modal-max-marks").innerText = currentMaxMarks;
 
   const marksInput = document.getElementById("grade-marks-input");
@@ -205,3 +225,11 @@ function setupGradingForm() {
     }
   });
 }
+
+window.handleDownloadSubmissionFile = async function(submissionId, filename) {
+  try {
+    await window.api.download(`/api/assignments/submissions/${submissionId}/file`, filename);
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to download student file", "error");
+  }
+};
