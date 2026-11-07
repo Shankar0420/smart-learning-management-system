@@ -1,0 +1,31 @@
+.DS_Store
+
+# Backend
+backend/target/
+backend/.idea/
+backend/*.iml
+
+# Frontend
+frontend/node_modules/
+frontend/.DS_Store
+
+# Environment files
+.env
+*.env
+backend/src/main/resources/application.properties
+
+# Local IDE settings
+.vscode/
+
+# Uploaded files
+backend/uploads/
+
+# Build and local files
+*.log
+.DS_Store
+classpath.pem
+/aiven-ca.pem
+backend/aiven-ca.pem
+*backup*.sql
+
+

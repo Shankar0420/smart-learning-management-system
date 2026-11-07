@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard - Galgotias LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <!-- Injected Sidebar -->
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <!-- Injected Top Header -->
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Student Dashboard</span>
+        </div>
+
+        <main class="dashboard-content">
+          <!-- Welcome Banner -->
+          <div style="margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);" id="welcome-heading">Welcome back!</h2>
+            <p class="text-muted" style="font-size: 0.875rem;">Here is your live academic summary from MariaDB.</p>
+          </div>
+
+          <!-- Student Quick Navigation Hub -->
+          <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <a href="/student/courses.html" class="btn btn-secondary btn-sm">📚 My Enrolled Courses</a>
+            <a href="/student/assignments.html" class="btn btn-secondary btn-sm">📝 Assignments & Submissions</a>
+            <a href="/student/grades.html" class="btn btn-secondary btn-sm">🏅 Academic Grades</a>
+            <a href="/student/profile.html" class="btn btn-secondary btn-sm">👤 Student Profile & ID</a>
+          </div>
+
+          <!-- Alert area for connection errors -->
+          <div id="dashboard-error-area" class="hidden"></div>
+
+          <!-- Backend Dynamic Statistics Cards -->
+          <div class="stats-grid" id="stats-grid-container" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-blue">📚</div>
+              <div>
+                <div class="stat-label">Enrolled Courses</div>
+                <div class="stat-value tabular-nums" id="stat-enrolled">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-purple">📑</div>
+              <div>
+                <div class="stat-label">Study Materials</div>
+                <div class="stat-value tabular-nums" id="stat-materials">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-green">📝</div>
+              <div>
+                <div class="stat-label">Published Quizzes</div>
+                <div class="stat-value tabular-nums" id="stat-quizzes">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-blue">📂</div>
+              <div>
+                <div class="stat-label">Total Assignments</div>
+                <div class="stat-value tabular-nums" id="stat-assignments">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-green">✅</div>
+              <div>
+                <div class="stat-label">Completed Lessons</div>
+                <div class="stat-value tabular-nums" id="stat-completed">-</div>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-amber">⏳</div>
+              <div>
+                <div class="stat-label">Pending Submissions</div>
+                <div class="stat-value tabular-nums" id="stat-pending">-</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Split Sections: Course Progress & Quiz Results -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Course Progress Section -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Course Progress</h3>
+                <a href="/student/courses.html" class="btn btn-outline btn-sm">View All Courses</a>
+              </div>
+              <div class="card-body" id="course-progress-container">
+                <div class="loading-container">
+                  <div class="spinner-primary"></div>
+                  <p>Loading course progress...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quiz Results & Scores Section -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Recent Quiz Results & Scores</h3>
+                <a href="/student/courses.html" class="btn btn-outline btn-sm">Take Quizzes</a>
+              </div>
+              <div class="card-body" id="quiz-scores-container" style="padding: 0;">
+                <div class="loading-container" style="padding: 2rem;">
+                  <div class="spinner-primary"></div>
+                  <p>Loading quiz scores...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Assignment Deadlines & Status Section -->
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Upcoming Assignment Deadlines & Status</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Track deadlines, submission status, and instructor grades</p>
+              </div>
+              <a href="/student/assignments.html" class="btn btn-outline btn-sm">All Assignments</a>
+            </div>
+            <div class="card-body" id="upcoming-assignments-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading upcoming assignments...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Study Materials Section -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Recent Course Study Materials</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Download course slides, PDFs, and revision decks</p>
+              </div>
+              <a href="/student/courses.html" class="btn btn-outline btn-sm">View Enrolled Courses</a>
+            </div>
+            <div class="card-body" id="recent-materials-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading study materials...</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/dashboard.js"></script>
+  </body>
+</html>

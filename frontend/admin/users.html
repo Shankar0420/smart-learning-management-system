@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management - Admin Portal</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">User Management</span>
+        </div>
+
+        <main class="dashboard-content">
+          <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: 2rem;">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">University User Accounts</h2>
+              <p class="text-muted" style="font-size: 0.875rem;">Manage active faculty and student accounts with MariaDB persistence</p>
+            </div>
+
+            <!-- Actions & Role Filter Tabs -->
+            <div class="flex items-center gap-3 flex-wrap">
+              <a href="/pages/register-admin.html" class="btn btn-sm btn-primary" style="background: #7c3aed; border-color: #6d28d9;">+ Register Administrator</a>
+              <div style="background: var(--bg-alt); padding: 0.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                <button id="filter-all" class="btn btn-sm btn-primary">All Users</button>
+                <button id="filter-admins" class="btn btn-sm btn-secondary" style="color: #6b21a8;">Admins</button>
+                <button id="filter-students" class="btn btn-sm btn-secondary">Students</button>
+                <button id="filter-teachers" class="btn btn-sm btn-secondary">Teachers</button>
+                <button id="filter-pending-teachers" class="btn btn-sm btn-secondary" style="color: #b45309;">⏳ Pending Teachers</button>
+                <button id="filter-pending-students" class="btn btn-sm btn-secondary" style="color: #1d4ed8;">⏳ Pending Students</button>
+                <button id="filter-active" class="btn btn-sm btn-secondary" style="color: #15803d;">Active</button>
+                <button id="filter-inactive" class="btn btn-sm btn-secondary" style="color: #b91c1c;">Inactive</button>
+              </div>
+            </div>
+          </div>
+
+
+          <div id="users-error-area" class="alert alert-danger hidden"></div>
+
+          <div class="card">
+            <div class="card-header flex items-center justify-between flex-wrap gap-3">
+              <div class="flex items-center gap-2">
+                <h3 class="card-title">Registered Accounts</h3>
+                <span class="badge badge-info" id="users-count-badge">0 Users</span>
+              </div>
+              <div class="flex items-center gap-2" style="min-width: 280px;">
+                <input
+                  type="text"
+                  id="users-search-input"
+                  class="form-input"
+                  style="padding: 0.35rem 0.75rem; font-size: 0.875rem;"
+                  placeholder="🔍 Search ID, Name, Email, Dept..."
+                />
+              </div>
+            </div>
+            <div class="card-body" id="users-table-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading users from MariaDB...</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Professional User Profile Modal -->
+    <div class="modal-overlay" id="user-profile-modal">
+      <div class="modal-container" style="max-width: 580px;">
+        <div class="modal-header">
+          <h3 class="modal-title">University Member Profile</h3>
+          <button class="modal-close" onclick="window.common.closeModal('user-profile-modal')">&times;</button>
+        </div>
+        <div class="modal-body" id="user-profile-modal-body">
+          <div class="loading-container">
+            <div class="spinner-primary"></div>
+            <p>Loading profile...</p>
+          </div>
+        </div>
+        <div class="modal-footer" id="user-profile-modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('user-profile-modal')">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/admin/users.js"></script>
+  </body>
+</html>
