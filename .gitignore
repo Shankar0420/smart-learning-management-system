@@ -23,3 +23,8 @@ backend/uploads/
 # Build and local files
 *.log
 .DS_Store
+classpath.pem
+/aiven-ca.pem
+backend/aiven-ca.pem
+
+

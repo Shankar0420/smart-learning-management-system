@@ -12,7 +12,7 @@ All backend variables are resolved dynamically by `application.properties` and `
 |---|---|---|---|
 | `PORT` | Optional | `8080` | Port on which the Spring Boot application listens. Automatically injected by hosting providers like Render via `$PORT`. |
 | `SPRING_PROFILES_ACTIVE` | Optional | `prod` (in production) | Activates the production profile (`application-prod.properties`), enforcing `validate` DDL mode and strict production CORS. |
-| `DB_URL` | **Yes** | *(None)* | JDBC connection URL to MariaDB/MySQL. For Aiven cloud SSL connections, use `?sslMode=verify-full&serverSslCert=classpath:aiven-ca.pem`. |
+| `DB_URL` | **Yes** | *(None)* | JDBC connection URL to MariaDB/MySQL. For Aiven cloud SSL connections, use `?sslMode=verify-full&serverSslCert=/tmp/aiven-ca.pem` (the backend's `AivenSslInitializer` automatically extracts the bundled CA certificate from the JAR to `/tmp/aiven-ca.pem` on startup). |
 | `DB_USERNAME` | **Yes** | *(None)* | Username for the MariaDB/MySQL database user (e.g. `avnadmin`). |
 | `DB_PASSWORD` | **Yes** | *(None)* | Secure password for the database user. **NEVER hardcode or commit to version control.** |
 | `DB_POOL_MAX` | Optional | `10` | Maximum number of concurrent connections in HikariCP pool. For cloud databases, keep between `5` and `10` to avoid exceeding connection quotas. |
@@ -39,7 +39,7 @@ PORT=8080
 SPRING_PROFILES_ACTIVE=prod
 
 # Aiven MariaDB / MySQL Cloud Database with Bundled SSL Certificate
-DB_URL=jdbc:mariadb://mysql-your-project.aivencloud.com:25708/lms_db?sslMode=verify-full&serverSslCert=classpath:aiven-ca.pem
+DB_URL=jdbc:mariadb://mysql-your-project.aivencloud.com:25708/lms_db?sslMode=verify-full&serverSslCert=/tmp/aiven-ca.pem
 DB_USERNAME=avnadmin
 DB_PASSWORD=REPLACE_WITH_YOUR_DB_PASSWORD
 
