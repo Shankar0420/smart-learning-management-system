@@ -26,5 +26,6 @@ backend/uploads/
 classpath.pem
 /aiven-ca.pem
 backend/aiven-ca.pem
+*backup*.sql
 
 

@@ -157,7 +157,63 @@ There are two ways to connect your Netlify frontend to your live backend:
 
 ---
 
-## 4. Alternative Free Backend Hosting Options
+## 4. Automated CI/CD Pipeline (GitHub Actions)
+
+The repository includes an automated pipeline in `.github/workflows/deploy.yml` configured exclusively for the `upgrade/phase1-error-fixing` branch.
+
+### Pipeline Architecture & Quality Gates
+
+```
+[Push to upgrade/phase1-error-fixing]
+                |
+                v
+[Job 1: test-and-verify]
+  - Java 17 + Maven 57 Integration Tests (Isolated H2 In-Memory DB)
+  - Backend JAR Packaging Pre-verification
+  - Frontend JS Syntax Validation (node --check)
+  - Critical Assets Check (index.html, config.js, dashboards)
+                |
+          (Passed 100%?)
+         /              \
+       NO                YES
+       /                  \
+[Pipeline Fails]      [Job 2: deploy-backend]
+[Zero Deploys]          - Trigger Render Deploy Hook (POST)
+                           |
+                      [Job 3: deploy-frontend]
+                        - Trigger Netlify Build Hook (POST)
+                           |
+                      [Job 4: verify-and-report]
+                        - Poll /api/health endpoint
+                        - Verify Netlify CDN reachability
+                        - Publish Markdown Summary
+```
+
+### Required GitHub Encrypted Secrets
+
+Navigate to **GitHub Repository $\rightarrow$ Settings $\rightarrow$ Secrets and variables $\rightarrow$ Actions $\rightarrow$ New repository secret**:
+
+| Secret Name | Service | How to Obtain | Permissions |
+|---|---|---|---|
+| `RENDER_DEPLOY_HOOK_URL` | Render | Render Dashboard $\rightarrow$ Web Service $\rightarrow$ **Settings** $\rightarrow$ scroll down to **Deploy Hook** $\rightarrow$ Copy URL | Webhook only (can only trigger redeploy for this specific service; cannot access credentials or database) |
+| `NETLIFY_BUILD_HOOK_URL` | Netlify | Netlify Dashboard $\rightarrow$ Site configuration $\rightarrow$ **Build & deploy** $\rightarrow$ **Continuous deployment** $\rightarrow$ **Build hooks** $\rightarrow$ Add build hook $\rightarrow$ Copy URL | Webhook only (can only trigger build for this specific site) |
+
+### Preventing Auto-Deploy Bypass on Hosting Services
+
+To guarantee that code is **never deployed before passing all 57 tests in GitHub Actions**, update these hosting settings:
+
+1. **Render Dashboard**:
+   - Go to **LMS Backend Web Service $\rightarrow$ Settings $\rightarrow$ Build & Deploy**.
+   - Set **Auto-Deploy** to **No**.
+   - Render will now deploy *only* when triggered by the GitHub Actions `RENDER_DEPLOY_HOOK_URL`.
+2. **Netlify Dashboard**:
+   - Go to **Site configuration $\rightarrow$ Build & deploy $\rightarrow$ Continuous deployment $\rightarrow$ Builds**.
+   - Under **Build status**, select **Stop builds** (or lock deploys).
+   - Netlify will now build *only* when triggered by the GitHub Actions `NETLIFY_BUILD_HOOK_URL`.
+
+---
+
+## 5. Alternative Free Backend Hosting Options
 
 If you prefer alternatives to Render:
 
@@ -175,7 +231,7 @@ If you prefer alternatives to Render:
 
 ---
 
-## 5. Post-Deployment Verification Checklist
+## 6. Post-Deployment Verification Checklist
 
 - [ ] `GET https://<backend>/api/health` returns `{"status":"UP", ...}`.
 - [ ] Primary Admin can log in using existing credentials.

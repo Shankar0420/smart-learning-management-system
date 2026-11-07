@@ -207,46 +207,91 @@ The database can contain information related to:
 
 Database configuration is maintained through the Spring Boot application configuration.
 
-## Requirements
+## Local Quick Start (macOS / VS Code)
 
-Before running the project locally, make sure the required software is installed:
-
-- Java
-- Apache Maven
-- MariaDB
-- Git
-- A modern web browser
-- Visual Studio Code or another suitable code editor
-
-## Running the Backend
-
-Open a terminal and move into the backend directory:
+You can start the complete LMS (Database check + Spring Boot Backend + Frontend + Browser) with a single command:
 
 ```bash
-cd backend
+# Start complete LMS locally
+./start-lms.sh
 ```
 
-Then start the Spring Boot application:
+To stop all local services:
 
 ```bash
-./mvnw spring-boot:run
+# Stop all local LMS services
+./stop-lms.sh
 ```
 
-On Windows, use:
+### Local URLs
+| Component | Local URL | Description |
+|---|---|---|
+| **Frontend UI** | [http://localhost:5500](http://localhost:5500) | Main LMS portal (HTML/CSS/Vanilla JS) |
+| **Backend REST API** | [http://localhost:8080](http://localhost:8080) | Spring Boot REST API |
+| **API Health Check** | [http://localhost:8080/api/health](http://localhost:8080/api/health) | Returns `{"status":"UP", ...}` |
 
+### Pre-Seeded Local Accounts
+| Role | Email | Password | Professional ID | Notes |
+|---|---|---|---|---|
+| **Administrator** | `admin@lms.com` | `admin123` | N/A | Full administrative privileges |
+| **Teacher** | `teacher@lms.com` | `teacher123` | `GUL-TEA-2026-001` | Course, quiz, assignment management |
+| **Student** | `student1@lms.com` | `student123` | `GUL-STU-2026-001` | Enrolled in Java Masterclass |
+| **Student** | `student2@lms.com` | `student123` | `GUL-STU-2026-002` | Enrolled student |
+
+---
+
+## Running in Visual Studio Code
+
+1. Open the repository root directory in VS Code:
+   ```bash
+   code .
+   ```
+2. Recommended VS Code extensions (auto-prompted via `.vscode/extensions.json`):
+   - **Extension Pack for Java** (`vscjava.vscode-java-pack`)
+   - **Spring Boot Extension Pack** (`vmware.vscode-spring-boot`)
+   - **Live Server** (`ritwickdey.liveserver`)
+3. Run or debug via VS Code:
+   - Press `Cmd + Shift + P` -> **Tasks: Run Task** -> **Start Complete LMS**
+   - Or run the backend with debugger: Press `F5` -> Select **LMS Backend (Spring Boot)**
+   - Or right-click `frontend/index.html` -> **Open with Live Server** (Port 5500)
+
+---
+
+## Manual Execution Commands
+
+### 1. Database Setup (Local MySQL / MariaDB)
+Ensure MySQL is running on `localhost:3306`:
 ```bash
-mvnw.cmd spring-boot:run
+# Check status / start via Homebrew
+brew services start mysql
+```
+The application connects automatically to `jdbc:mariadb://localhost:3306/lms_db` with user `root` (no password by default). All 16 database tables and migrations are pre-configured.
+
+### 2. Running the Backend
+From the repository root:
+```bash
+./start-backend.sh
+```
+Or directly with Maven:
+```bash
+mvn -f backend/pom.xml spring-boot:run
 ```
 
-Make sure MariaDB is running and the database configuration is correctly configured before starting the backend.
+### 3. Running the Frontend
+From the repository root:
+```bash
+./start-frontend.sh
+```
+Or with Python:
+```bash
+python3 -m http.server 5500 --directory frontend
+```
 
-## Running the Frontend
-
-Open the `frontend` folder in Visual Studio Code.
-
-Run the frontend using a local development server such as the Live Server extension or another suitable static web server.
-
-Make sure the frontend API configuration points to the running Spring Boot backend.
+### 4. Running Backend Tests
+Execute all 57 integration and unit tests against an isolated in-memory test database:
+```bash
+mvn -f backend/pom.xml test
+```
 
 ## Connecting Frontend and Backend
 
