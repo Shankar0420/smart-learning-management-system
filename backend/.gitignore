@@ -1,0 +1,30 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Database credentials
+application.properties
+application-*.properties
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Uploaded user files
+uploads/
+backend/uploads/
+
+# Build and runtime files
+target/
+bin/
+logs/
+*.log
+
+# IDE and operating system files
+.idea/
+.DS_Store
