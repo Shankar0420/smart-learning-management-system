@@ -4,49 +4,52 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
+  const rootDir = __dirname;
   return {
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(rootDir, '.'),
       },
     },
     build: {
       rollupOptions: {
         input: {
-          main: path.resolve(__dirname, 'index.html'),
-          login: path.resolve(__dirname, 'pages/login.html'),
-          register: path.resolve(__dirname, 'pages/register.html'),
-          registerTeacher: path.resolve(__dirname, 'pages/register-teacher.html'),
+          main: path.resolve(rootDir, 'index.html'),
+          login: path.resolve(rootDir, 'pages/login.html'),
+          register: path.resolve(rootDir, 'pages/register.html'),
+          registerTeacher: path.resolve(rootDir, 'pages/register-teacher.html'),
+          registerAdmin: path.resolve(rootDir, 'pages/register-admin.html'),
+          forgotPassword: path.resolve(rootDir, 'pages/forgot-password.html'),
+          resetPassword: path.resolve(rootDir, 'pages/reset-password.html'),
 
-          studentDashboard: path.resolve(__dirname, 'student/dashboard.html'),
-          studentCourses: path.resolve(__dirname, 'student/courses.html'),
-          studentCourseDetails: path.resolve(__dirname, 'student/course-details.html'),
-          studentLearning: path.resolve(__dirname, 'student/learning.html'),
-          studentQuiz: path.resolve(__dirname, 'student/quiz.html'),
-          studentAssignments: path.resolve(__dirname, 'student/assignments.html'),
-          studentGrades: path.resolve(__dirname, 'student/grades.html'),
-          studentProfile: path.resolve(__dirname, 'student/profile.html'),
-          teacherDashboard: path.resolve(__dirname, 'teacher/dashboard.html'),
-          teacherCourses: path.resolve(__dirname, 'teacher/courses.html'),
-          teacherCourseForm: path.resolve(__dirname, 'teacher/course-form.html'),
-          teacherCourseDetails: path.resolve(__dirname, 'teacher/course-details.html'),
-          teacherQuizManagement: path.resolve(__dirname, 'teacher/quiz-management.html'),
-          teacherAssignmentManagement: path.resolve(__dirname, 'teacher/assignment-management.html'),
-          teacherSubmissions: path.resolve(__dirname, 'teacher/submissions.html'),
-          teacherProfile: path.resolve(__dirname, 'teacher/profile.html'),
-          adminDashboard: path.resolve(__dirname, 'admin/dashboard.html'),
-          adminUsers: path.resolve(__dirname, 'admin/users.html'),
-          adminCourses: path.resolve(__dirname, 'admin/courses.html'),
-          adminProfile: path.resolve(__dirname, 'admin/profile.html'),
+          studentDashboard: path.resolve(rootDir, 'student/dashboard.html'),
+          studentCourses: path.resolve(rootDir, 'student/courses.html'),
+          studentCourseDetails: path.resolve(rootDir, 'student/course-details.html'),
+          studentLearning: path.resolve(rootDir, 'student/learning.html'),
+          studentQuiz: path.resolve(rootDir, 'student/quiz.html'),
+          studentAssignments: path.resolve(rootDir, 'student/assignments.html'),
+          studentGrades: path.resolve(rootDir, 'student/grades.html'),
+          studentProfile: path.resolve(rootDir, 'student/profile.html'),
+          teacherDashboard: path.resolve(rootDir, 'teacher/dashboard.html'),
+          teacherCourses: path.resolve(rootDir, 'teacher/courses.html'),
+          teacherCourseForm: path.resolve(rootDir, 'teacher/course-form.html'),
+          teacherCourseDetails: path.resolve(rootDir, 'teacher/course-details.html'),
+          teacherQuizManagement: path.resolve(rootDir, 'teacher/quiz-management.html'),
+          teacherAssignmentManagement: path.resolve(rootDir, 'teacher/assignment-management.html'),
+          teacherSubmissions: path.resolve(rootDir, 'teacher/submissions.html'),
+          teacherProfile: path.resolve(rootDir, 'teacher/profile.html'),
+          adminDashboard: path.resolve(rootDir, 'admin/dashboard.html'),
+          adminUsers: path.resolve(rootDir, 'admin/users.html'),
+          adminCourses: path.resolve(rootDir, 'admin/courses.html'),
+          adminProfile: path.resolve(rootDir, 'admin/profile.html'),
         },
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modify—file watching is disabled to prevent flickering during agent edits.
+      port: 5500,
+      host: '0.0.0.0',
       hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
   };
