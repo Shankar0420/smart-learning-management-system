@@ -1,0 +1,15 @@
+::1 - - [07/Nov/2026 18:42:14] "GET / HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /css/style.css HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /css/components.css HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /css/dashboard.css HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /css/responsive.css HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /js/config.js HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /js/api.js HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /js/auth.js HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /js/common.js HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] "GET /assets/images/lms_hero_banner.jpg HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:42:14] code 404, message File not found
+::1 - - [07/Nov/2026 18:42:14] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [07/Nov/2026 18:42:26] "HEAD / HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:43:04] "GET /pages/login.html?role=ADMIN HTTP/1.1" 200 -
+::1 - - [07/Nov/2026 18:43:04] "GET /css/auth.css HTTP/1.1" 200 -

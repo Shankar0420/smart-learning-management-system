@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.common.initDashboardLayout("STUDENT", "dashboard");
 
   await loadStudentDashboard();
+  await loadAnnouncements();
+  await loadAttendanceSummary();
 });
 
 async function loadStudentDashboard() {
@@ -237,3 +239,110 @@ window.handleDownloadDashboardMaterial = async function(materialId, filename) {
     window.common.showToast(err.message || "Failed to download material", "error");
   }
 };
+
+async function loadAnnouncements() {
+  const container = document.getElementById("student-announcements-container");
+  if (!container) return;
+
+  try {
+    const list = await window.api.get("/api/announcements").catch(() => []);
+    if (!Array.isArray(list) || list.length === 0) {
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 0.5rem;">
+            📢 University & Course Notices
+          </h3>
+          <span class="badge badge-info">${list.length} Notice${list.length > 1 ? 's' : ''}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          ${list.slice(0, 3).map(a => {
+            const priorityClass = a.priority === "URGENT" ? "badge-danger" : (a.priority === "HIGH" ? "badge-warning" : "badge-info");
+            return `
+              <div class="announcement-card priority-${window.common.escapeHTML(a.priority)}" style="margin-bottom: 0; padding: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                  <strong style="font-size: 0.95rem; color: #0f172a;">${window.common.escapeHTML(a.title)}</strong>
+                  <span class="badge ${priorityClass}">${window.common.escapeHTML(a.priority)}</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #334155; margin-bottom: 0.5rem; line-height: 1.5;">${window.common.escapeHTML(a.content)}</p>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); display: flex; gap: 1rem;">
+                  <span>📍 ${window.common.escapeHTML(a.courseTitle || 'University-Wide')}</span>
+                  <span>👤 ${window.common.escapeHTML(a.authorName || 'Administration')}</span>
+                  <span>⏱️ ${window.common.formatDate(a.createdAt)}</span>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    console.warn("Could not load announcements:", e);
+  }
+}
+
+async function loadAttendanceSummary() {
+  const container = document.getElementById("attendance-overview-body");
+  const statRate = document.getElementById("stat-attendance-rate");
+  const pill = document.getElementById("attendance-status-pill");
+  if (!container) return;
+
+  try {
+    const data = await window.api.get("/api/attendance/my-summary");
+    const pct = data.overallPercentage ?? 100.0;
+    if (statRate) statRate.innerText = `${pct}%`;
+
+    let badgeClass = "badge-success";
+    let statusText = "Eligible for Examinations (≥75%)";
+    if (pct < 75.0) {
+      badgeClass = "badge-danger";
+      statusText = "Low Attendance (<75%) - Action Required";
+    } else if (pct < 80.0) {
+      badgeClass = "badge-warning";
+      statusText = "Borderline (75% - 80%)";
+    }
+
+    if (pill) {
+      pill.className = `badge ${badgeClass}`;
+      pill.innerText = statusText;
+    }
+
+    const breakdown = data.courseBreakdown || [];
+
+    container.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; align-items: center;">
+        <div class="attendance-meter-card" style="border: none; background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-md);">
+          <div>
+            <div class="attendance-percentage-badge ${pct >= 75 ? 'good' : 'danger'}">${pct}%</div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-top: 0.25rem;">Overall Attendance</div>
+          </div>
+          <div style="border-left: 1px solid var(--border-color); padding-left: 1rem;">
+            <div style="font-size: 0.85rem; margin-bottom: 0.35rem;"><strong>${data.presentClasses ?? 0}</strong> Attended</div>
+            <div style="font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--danger);"><strong>${data.absentClasses ?? 0}</strong> Absent</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);"><strong>${data.totalClasses ?? 0}</strong> Total Sessions</div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.75rem;">Course Breakdown</h4>
+          ${breakdown.length === 0 ? '<p class="text-muted" style="font-size: 0.85rem;">No lecture sessions recorded yet.</p>' : `
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              ${breakdown.map(c => `
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+                  <span style="font-weight: 500; color: var(--dark);">${window.common.escapeHTML(c.courseTitle)}</span>
+                  <span class="badge ${c.percentage >= 75 ? 'badge-success' : 'badge-danger'}" style="font-weight: 700;">${c.percentage}% (${c.attendedSessions}/${c.totalSessions})</span>
+                </div>
+              `).join("")}
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `<p class="text-muted" style="font-size: 0.85rem;">Attendance tracker initialized. Attendance will appear here once faculty records lecture sessions.</p>`;
+  }
+}

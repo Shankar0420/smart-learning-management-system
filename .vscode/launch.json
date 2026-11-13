@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "LMS Backend (Spring Boot)",
+            "request": "launch",
+            "mainClass": "com.lms.LmsApplication",
+            "projectName": "lms-backend",
+            "cwd": "${workspaceFolder}/backend"
+        }
+    ]
+}
+

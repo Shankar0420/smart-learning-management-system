@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Form - Teacher Portal</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Course Editor</span>
+        </div>
+
+        <main class="dashboard-content" style="max-width: 800px;">
+          <div style="margin-bottom: 1.5rem;">
+            <a href="/teacher/courses.html" class="text-muted" style="font-size: 0.85rem;">← Back to My Courses</a>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title" id="form-heading">Create New Course</h2>
+            </div>
+            <div class="card-body">
+              <div id="form-error-alert" class="alert alert-danger hidden"></div>
+
+              <form id="course-form" novalidate>
+                <div class="form-group">
+                  <label class="form-label required" for="course-title">Course Title</label>
+                  <input
+                    type="text"
+                    id="course-title"
+                    name="title"
+                    class="form-input"
+                    placeholder="e.g. Advanced Java & Spring Boot Architecture"
+                    required
+                  />
+                  <span class="form-error hidden" id="title-error"></span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required" for="course-description">Course Description</label>
+                  <textarea
+                    id="course-description"
+                    name="description"
+                    class="form-textarea"
+                    rows="5"
+                    placeholder="Provide a comprehensive syllabus overview, prerequisites, and learning objectives..."
+                    required
+                  ></textarea>
+                  <span class="form-error hidden" id="desc-error"></span>
+                </div>
+
+                <div class="form-group">
+                  <label class="checkbox-label" for="course-active">
+                    <input type="checkbox" id="course-active" name="active" checked />
+                    <span>Make this course active and visible to students immediately</span>
+                  </label>
+                </div>
+
+                <div class="flex items-center justify-between" style="margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+                  <a href="/teacher/courses.html" class="btn btn-secondary">Cancel</a>
+                  <button type="submit" id="save-course-btn" class="btn btn-primary btn-lg">
+                    <span id="btn-spinner" class="spinner hidden"></span>
+                    <span id="btn-label">Save Course</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/teacher/course-form.js"></script>
+  </body>
+</html>

@@ -151,22 +151,27 @@ function initDashboardLayout(role, activePageKey) {
     STUDENT: [
       { key: "dashboard", label: "Dashboard", href: "/student/dashboard.html", icon: "📊" },
       { key: "courses", label: "My Courses", href: "/student/courses.html", icon: "📚" },
+      { key: "quiz", label: "Quizzes & Tests", href: "/student/quiz.html", icon: "⏱️" },
       { key: "assignments", label: "Assignments", href: "/student/assignments.html", icon: "📝" },
       { key: "grades", label: "Grades", href: "/student/grades.html", icon: "🏅" },
+      { key: "gul-buddy", label: "GUL Buddy AI", href: "javascript:window.common.openGulBuddy()", icon: "✨" },
       { key: "profile", label: "Profile", href: "/student/profile.html", icon: "👤" }
     ],
     TEACHER: [
       { key: "dashboard", label: "Dashboard", href: "/teacher/dashboard.html", icon: "📊" },
       { key: "courses", label: "My Courses", href: "/teacher/courses.html", icon: "📚" },
+      { key: "quizzes", label: "Quiz Bank", href: "/teacher/quiz-management.html", icon: "⏱️" },
       { key: "assignments", label: "Assignments", href: "/teacher/assignment-management.html", icon: "📝" },
       { key: "submissions", label: "Submissions", href: "/teacher/submissions.html", icon: "📥" },
+      { key: "gul-buddy", label: "GUL Buddy AI", href: "javascript:window.common.openGulBuddy()", icon: "✨" },
       { key: "profile", label: "Profile", href: "/teacher/profile.html", icon: "👤" }
     ],
     ADMIN: [
       { key: "dashboard", label: "Dashboard", href: "/admin/dashboard.html", icon: "📊" },
-      { key: "users", label: "Users", href: "/admin/users.html", icon: "👥" },
-      { key: "courses", label: "Courses", href: "/admin/courses.html", icon: "📚" },
-      { key: "profile", label: "Profile", href: "/admin/profile.html", icon: "👤" }
+      { key: "users", label: "User Management", href: "/admin/users.html", icon: "👥" },
+      { key: "courses", label: "Course Allocation", href: "/admin/courses.html", icon: "📚" },
+      { key: "gul-buddy", label: "GUL Buddy AI", href: "javascript:window.common.openGulBuddy()", icon: "✨" },
+      { key: "profile", label: "Admin Profile", href: "/admin/profile.html", icon: "👤" }
     ]
   };
 
@@ -274,6 +279,146 @@ function initDashboardLayout(role, activePageKey) {
 
   // Inject Backend API Config Modal once into DOM
   injectApiConfigModal();
+
+  // Inject GUL Buddy AI Floating Widget
+  injectGulBuddyWidget();
+}
+
+/**
+ * Injects GUL Buddy AI Floating Launcher & Interactive Drawer
+ */
+function injectGulBuddyWidget() {
+  if (document.getElementById("gul-buddy-floating-btn")) return;
+
+  const widgetHtml = `
+    <!-- GUL Buddy Floating Launcher -->
+    <div class="gul-buddy-launcher" id="gul-buddy-floating-btn" onclick="window.common.openGulBuddy()">
+      <span class="gul-buddy-sparkle">✨</span>
+      <span>GUL Buddy AI</span>
+    </div>
+
+    <!-- GUL Buddy Interactive Drawer -->
+    <div class="gul-buddy-window" id="gul-buddy-window">
+      <div class="gul-buddy-header">
+        <div class="gul-buddy-title">
+          <div class="gul-buddy-avatar">🎓</div>
+          <div class="gul-buddy-header-text">
+            <h3>GUL Buddy AI</h3>
+            <p>Galgotias Academic Assistant</p>
+          </div>
+        </div>
+        <button class="gul-buddy-close" onclick="window.common.closeGulBuddy()">&times;</button>
+      </div>
+
+      <div class="gul-buddy-messages" id="gul-buddy-message-stream">
+        <div class="chat-bubble chat-bubble-bot">
+          <h3>Welcome to GUL Buddy! 👋</h3>
+          <p>I am your university AI companion powered by Galgotias LMS. Ask me anything about your course topics, code questions, exam preparation, or assignment guidelines!</p>
+        </div>
+      </div>
+
+      <div class="chat-chips-bar">
+        <button class="chat-chip" onclick="window.common.sendQuickPrompt('Explain Spring Security filters in Java')">☕ Spring Security</button>
+        <button class="chat-chip" onclick="window.common.sendQuickPrompt('Generate 3 practice questions for my exams')">📝 Practice Quiz</button>
+        <button class="chat-chip" onclick="window.common.sendQuickPrompt('What are the university attendance requirements?')">📊 Attendance Norms</button>
+        <button class="chat-chip" onclick="window.common.sendQuickPrompt('How should I structure my assignment submission?')">📋 Assignment Tips</button>
+      </div>
+
+      <div class="gul-buddy-input-wrap">
+        <input type="text" id="gul-buddy-user-input" class="gul-buddy-input" placeholder="Ask GUL Buddy a question..." onkeydown="if(event.key==='Enter') window.common.handleSendGulBuddy()" />
+        <button class="gul-buddy-send-btn" id="gul-buddy-send-btn" onclick="window.common.handleSendGulBuddy()">Send</button>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML("beforeend", widgetHtml);
+}
+
+function openGulBuddy() {
+  const win = document.getElementById("gul-buddy-window");
+  if (win) {
+    win.classList.add("active");
+    const input = document.getElementById("gul-buddy-user-input");
+    if (input) input.focus();
+  }
+}
+
+function closeGulBuddy() {
+  const win = document.getElementById("gul-buddy-window");
+  if (win) {
+    win.classList.remove("active");
+  }
+}
+
+async function handleSendGulBuddy() {
+  const input = document.getElementById("gul-buddy-user-input");
+  if (!input) return;
+  const prompt = input.value.trim();
+  if (!prompt) return;
+
+  input.value = "";
+  await sendGulBuddyMessage(prompt);
+}
+
+function sendQuickPrompt(promptText) {
+  openGulBuddy();
+  sendGulBuddyMessage(promptText);
+}
+
+async function sendGulBuddyMessage(promptText) {
+  const stream = document.getElementById("gul-buddy-message-stream");
+  if (!stream) return;
+
+  // Append user bubble
+  const userBubble = document.createElement("div");
+  userBubble.className = "chat-bubble chat-bubble-user";
+  userBubble.innerText = promptText;
+  stream.appendChild(userBubble);
+
+  // Append temporary loading bot bubble
+  const botBubble = document.createElement("div");
+  botBubble.className = "chat-bubble chat-bubble-bot";
+  botBubble.innerHTML = `<em>Thinking & generating academic insight...</em>`;
+  stream.appendChild(botBubble);
+  stream.scrollTop = stream.scrollHeight;
+
+  try {
+    const res = await window.api.post("/api/ai/chat", {
+      prompt: promptText,
+      context: "STUDENT_ASSISTANT"
+    });
+
+    const reply = res.reply || "I am ready to assist with your academic coursework.";
+    // Simple markdown renderer for clean line breaks, bold and code
+    botBubble.innerHTML = renderSimpleMarkdown(reply);
+  } catch (err) {
+    botBubble.innerHTML = `<span style="color: var(--danger);">⚠️ ${escapeHTML(err.message || "Failed to reach AI service. Please try again.")}</span>`;
+  }
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function renderSimpleMarkdown(text) {
+  if (!text) return "";
+  let html = escapeHTML(text);
+
+  // Headers ###
+  html = html.replace(/^### (.*$)/gim, '<h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem; color: #0f172a;">$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: #0f172a;">$1</h3>');
+
+  // Bold **text**
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  // Italics *text*
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+  // Bullet points
+  html = html.replace(/^\- (.*$)/gim, '<div style="margin-left: 0.75rem; margin-bottom: 0.25rem;">• $1</div>');
+
+  // Line breaks
+  html = html.replace(/\n\n/g, '<p style="margin: 0.4rem 0;"></p>');
+  html = html.replace(/\n/g, '<br/>');
+
+  return html;
 }
 
 /**
@@ -399,5 +544,10 @@ window.common = {
   confirmAction,
   initDashboardLayout,
   openApiConfigModal,
-  startBackendHealthMonitor
+  startBackendHealthMonitor,
+  openGulBuddy,
+  closeGulBuddy,
+  sendQuickPrompt,
+  handleSendGulBuddy,
+  sendGulBuddyMessage
 };

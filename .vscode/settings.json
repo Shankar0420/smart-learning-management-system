@@ -1,0 +1,13 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "files.exclude": {
+        "**/frontend/dist": true,
+        "**/target": true
+    },
+    "search.exclude": {
+        "**/frontend/dist": true,
+        "**/target": true,
+        "**/node_modules": true
+    }
+}

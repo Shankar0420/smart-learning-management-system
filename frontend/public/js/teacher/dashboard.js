@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   await loadTeacherDashboard();
+  await loadTeacherAnnouncements();
+  setupTeacherActionModals();
 });
 
 async function loadTeacherDashboard() {
@@ -174,4 +176,151 @@ window.handleDownloadTeacherMaterial = async function(materialId, filename) {
   } catch (err) {
     window.common.showToast(err.message || "Failed to download material", "error");
   }
+};
+
+let teacherCoursesCache = [];
+
+async function loadTeacherAnnouncements() {
+  const container = document.getElementById("teacher-announcements-container");
+  if (!container) return;
+
+  try {
+    const list = await window.api.get("/api/announcements").catch(() => []);
+    if (!Array.isArray(list) || list.length === 0) {
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 0.5rem;">
+            📢 Active Course & Faculty Notices
+          </h3>
+          <span class="badge badge-info">${list.length} Notice${list.length > 1 ? 's' : ''}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          ${list.slice(0, 3).map(a => `
+            <div class="announcement-card priority-${window.common.escapeHTML(a.priority)}" style="margin-bottom: 0; padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <strong style="font-size: 0.95rem; color: #0f172a;">${window.common.escapeHTML(a.title)}</strong>
+                <span class="badge ${a.priority === 'URGENT' ? 'badge-danger' : (a.priority === 'HIGH' ? 'badge-warning' : 'badge-info')}">${window.common.escapeHTML(a.priority)}</span>
+              </div>
+              <p style="font-size: 0.85rem; color: #334155; margin-bottom: 0.5rem; line-height: 1.5;">${window.common.escapeHTML(a.content)}</p>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); display: flex; gap: 1rem;">
+                <span>📍 ${window.common.escapeHTML(a.courseTitle || 'University-Wide')}</span>
+                <span>👤 ${window.common.escapeHTML(a.authorName || 'Faculty')}</span>
+                <span>⏱️ ${window.common.formatDate(a.createdAt)}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    console.warn("Could not load teacher announcements:", e);
+  }
+}
+
+async function setupTeacherActionModals() {
+  teacherCoursesCache = await window.api.get("/api/courses").catch(() => []);
+  if (!Array.isArray(teacherCoursesCache)) {
+    teacherCoursesCache = teacherCoursesCache.courses || [];
+  }
+
+  // Populate Select Boxes
+  const annSelect = document.getElementById("ann-course-select");
+  const attSelect = document.getElementById("att-course-select");
+
+  const optionsHtml = teacherCoursesCache.map(c => `
+    <option value="${c.id}">${window.common.escapeHTML(c.title)}</option>
+  `).join("");
+
+  if (annSelect) annSelect.innerHTML = optionsHtml;
+  if (attSelect) attSelect.innerHTML = optionsHtml;
+
+  // Set default date to today for attendance
+  const attDate = document.getElementById("att-date");
+  if (attDate) attDate.value = new Date().toISOString().split("T")[0];
+
+  // Announcement Form Handler
+  const annForm = document.getElementById("teacher-announcement-form");
+  if (annForm) {
+    annForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const courseId = document.getElementById("ann-course-select").value;
+      const title = document.getElementById("ann-title").value.trim();
+      const priority = document.getElementById("ann-priority").value;
+      const content = document.getElementById("ann-content").value.trim();
+
+      try {
+        const btn = document.getElementById("ann-submit-btn");
+        btn.disabled = true;
+        btn.innerText = "Publishing...";
+
+        await window.api.post("/api/announcements", {
+          courseId: courseId ? Number(courseId) : null,
+          title,
+          priority,
+          content,
+          targetRole: "STUDENT"
+        });
+
+        window.common.showToast("Notice published successfully!", "success");
+        window.common.closeModal("teacher-announcement-modal");
+        annForm.reset();
+        await loadTeacherAnnouncements();
+      } catch (err) {
+        window.common.showToast(err.message || "Failed to publish announcement", "error");
+      } finally {
+        const btn = document.getElementById("ann-submit-btn");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "Publish Notice";
+        }
+      }
+    });
+  }
+
+  // Attendance Form Handler
+  const attForm = document.getElementById("teacher-attendance-form");
+  if (attForm) {
+    attForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const courseId = document.getElementById("att-course-select").value;
+      const sessionDate = document.getElementById("att-date").value;
+      const topic = document.getElementById("att-topic").value.trim();
+
+      try {
+        const btn = document.getElementById("att-submit-btn");
+        btn.disabled = true;
+        btn.innerText = "Recording...";
+
+        await window.api.post(`/api/attendance/courses/${courseId}/sessions`, {
+          sessionDate,
+          topic
+        });
+
+        window.common.showToast("Attendance session recorded successfully!", "success");
+        window.common.closeModal("teacher-attendance-modal");
+        attForm.reset();
+      } catch (err) {
+        window.common.showToast(err.message || "Failed to record attendance session", "error");
+      } finally {
+        const btn = document.getElementById("att-submit-btn");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "Save Session";
+        }
+      }
+    });
+  }
+}
+
+window.openTeacherAnnouncementModal = function() {
+  window.common.openModal("teacher-announcement-modal");
+};
+
+window.openTeacherAttendanceModal = function() {
+  window.common.openModal("teacher-attendance-modal");
 };

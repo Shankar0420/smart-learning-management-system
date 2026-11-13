@@ -1,0 +1,40 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start LMS Backend",
+            "type": "shell",
+            "command": "./start-backend.sh",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start LMS Frontend",
+            "type": "shell",
+            "command": "./start-frontend.sh",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Start Complete LMS",
+            "type": "shell",
+            "command": "./start-lms.sh",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Stop LMS",
+            "type": "shell",
+            "command": "./stop-lms.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Backend Tests",
+            "type": "shell",
+            "command": "mvn -f backend/pom.xml test",
+            "group": "test",
+            "problemMatcher": []
+        }
+    ]
+}
+

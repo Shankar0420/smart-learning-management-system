@@ -1,0 +1,18 @@
+
+# Local logs and database backups
+*.log
+backend/database/backup_*.sql
+
+# System files
+.DS_Store
+**/.DS_Store
+
+# Sensitive files
+*.pem
+*.key
+.env
+.env.*
+
+# Logs and database backups
+*.log
+backend/database/backup_*.sql

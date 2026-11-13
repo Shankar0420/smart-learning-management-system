@@ -19,10 +19,26 @@
         </div>
 
         <main class="dashboard-content">
-          <div style="margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">University System Administration</h2>
-            <p class="text-muted" style="font-size: 0.875rem;">Global metrics, user accounts, and course offerings from MariaDB</p>
+          <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: 2rem;">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">University System Administration</h2>
+              <p class="text-muted" style="font-size: 0.875rem;">Global metrics, user accounts, audit logging, and university operations</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="window.openAdminAnnouncementModal()" class="btn btn-secondary btn-sm">
+                📢 University Notice
+              </button>
+              <button onclick="window.common.openGulBuddy()" class="btn btn-secondary btn-sm">
+                ✨ Ask GUL Buddy AI
+              </button>
+              <a href="/admin/users.html" class="btn btn-primary btn-sm">
+                👥 Manage Users
+              </a>
+            </div>
           </div>
+
+          <!-- University Announcements Feed -->
+          <div id="admin-announcements-container" style="margin-bottom: 1.5rem;"></div>
 
           <div id="admin-error-area" class="alert alert-danger hidden"></div>
 
@@ -171,6 +187,25 @@
             </div>
           </div>
 
+          <!-- Administrative Audit Trail Section -->
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 class="card-title">Security & Administrative Audit Logs</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Real-time ledger of administrative approvals, activations, and academic actions</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="loadAuditLogs()">
+                🔄 Refresh Logs
+              </button>
+            </div>
+            <div class="card-body" id="admin-audit-logs-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading security audit logs from MariaDB...</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Live Database Status Details -->
           <div class="card">
             <div class="card-header">
@@ -199,6 +234,48 @@
             </div>
           </div>
         </main>
+      </div>
+    </div>
+
+    <!-- Modal: Publish University Notice -->
+    <div class="modal-overlay" id="admin-announcement-modal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 class="modal-title">Publish University-Wide Notice</h3>
+          <button class="modal-close" onclick="window.common.closeModal('admin-announcement-modal')">&times;</button>
+        </div>
+        <form id="admin-announcement-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label required" for="adm-ann-title">Notice Title</label>
+              <input type="text" id="adm-ann-title" class="form-input" placeholder="e.g., Campus Schedule & Academic Calendar" required maxlength="255" />
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="adm-ann-priority">Priority Level</label>
+              <select id="adm-ann-priority" class="form-select">
+                <option value="NORMAL">Normal Priority</option>
+                <option value="HIGH">High Priority</option>
+                <option value="URGENT">Urgent University Alert</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="adm-ann-target">Target Audience</label>
+              <select id="adm-ann-target" class="form-select">
+                <option value="ALL">All University Users (Students & Faculty)</option>
+                <option value="STUDENT">Students Only</option>
+                <option value="TEACHER">Faculty Teachers Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="adm-ann-content">Notice Content</label>
+              <textarea id="adm-ann-content" class="form-textarea" rows="4" placeholder="Enter official university announcement text..." required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('admin-announcement-modal')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="adm-ann-submit-btn">Publish to University</button>
+          </div>
+        </form>
       </div>
     </div>
 
