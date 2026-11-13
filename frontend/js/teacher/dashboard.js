@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadTeacherDashboard();
   await loadTeacherAnnouncements();
+  await loadAcademicCalendar();
   setupTeacherActionModals();
 });
 
@@ -324,3 +325,137 @@ window.openTeacherAnnouncementModal = function() {
 window.openTeacherAttendanceModal = function() {
   window.common.openModal("teacher-attendance-modal");
 };
+
+/**
+ * Academic Calendar Subsystem for Teachers
+ */
+async function loadAcademicCalendar() {
+  const container = document.getElementById("teacher-calendar-container");
+  if (!container) return;
+
+  try {
+    const events = await window.api.get("/api/calendar/events");
+    const list = Array.isArray(events) ? events : [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 1.5rem; color: #64748b; font-size: 0.85rem;">
+          No academic events scheduled currently. Click "+ Add Academic Event" to publish exam dates and deadlines.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+        ${list.map(e => {
+          const type = (e.eventType || "EVENT").toUpperCase();
+          let badgeColor = "badge-info";
+          let icon = "📌";
+          if (type === "EXAM") { badgeColor = "badge-danger"; icon = "📝"; }
+          else if (type === "HOLIDAY") { badgeColor = "badge-success"; icon = "🏖️"; }
+          else if (type === "ASSIGNMENT_DEADLINE") { badgeColor = "badge-warning"; icon = "⏱️"; }
+          else if (type === "INTERNAL_ASSESSMENT") { badgeColor = "badge-primary"; icon = "📊"; }
+
+          return `
+            <div style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+                <span class="badge ${badgeColor}" style="font-size: 0.72rem;">${icon} ${type.replace(/_/g, " ")}</span>
+                <button class="btn btn-danger-outline btn-sm" style="font-size: 0.7rem; padding: 0.1rem 0.35rem;" onclick="handleDeleteCalendarEvent(${e.id}, '${window.common.escapeHTML(e.title)}')">✕</button>
+              </div>
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">
+                ${window.common.escapeHTML(e.title)}
+              </h4>
+              <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.4rem;">
+                📅 ${window.common.formatDate(e.startDate)}
+              </div>
+              ${e.description ? `
+                <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.4rem; line-height: 1.35;">
+                  ${window.common.escapeHTML(e.description)}
+                </p>
+              ` : ''}
+              ${e.courseTitle ? `
+                <div style="font-size: 0.72rem; color: #3b82f6; font-weight: 500;">
+                  📚 ${window.common.escapeHTML(e.courseTitle)}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `<p class="text-muted" style="font-size: 0.85rem;">Failed to load calendar events.</p>`;
+  }
+}
+
+window.openAddEventModal = async function() {
+  const select = document.getElementById("event-course-select");
+  if (select) {
+    try {
+      const courses = await window.api.get("/api/courses").catch(() => []);
+      select.innerHTML = '<option value="">General (All Students)</option>' +
+        courses.map(c => `<option value="${c.id}">${window.common.escapeHTML(c.title)}</option>`).join("");
+    } catch (e) {}
+  }
+  const form = document.getElementById("add-calendar-event-form");
+  if (form) form.reset();
+  window.common.openModal("add-calendar-event-modal");
+};
+
+window.handleDeleteCalendarEvent = function(id, title) {
+  window.common.confirmAction(`Delete calendar event "${title}"?`, async () => {
+    try {
+      await window.api.delete(`/api/calendar/events/${id}`);
+      window.common.showToast("Event removed from calendar", "success");
+      await loadAcademicCalendar();
+    } catch (err) {
+      window.common.showToast(err.message || "Failed to delete event", "error");
+    }
+  });
+};
+
+// Form event listener for calendar event
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("add-calendar-event-form");
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("event-title-input")?.value.trim();
+      const eventType = document.getElementById("event-type-select")?.value;
+      const courseId = document.getElementById("event-course-select")?.value || null;
+      const startDate = document.getElementById("event-start-date")?.value;
+      const endDate = document.getElementById("event-end-date")?.value || null;
+      const description = document.getElementById("event-desc-input")?.value.trim();
+
+      const btn = document.getElementById("save-calendar-event-btn");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Publishing...";
+      }
+
+      try {
+        await window.api.post("/api/calendar/events", {
+          title,
+          eventType,
+          courseId: courseId ? Number(courseId) : null,
+          startDate,
+          endDate,
+          description,
+          allDay: false
+        });
+
+        window.common.showToast("Event scheduled on Academic Calendar!", "success");
+        window.common.closeModal("add-calendar-event-modal");
+        await loadAcademicCalendar();
+      } catch (err) {
+        window.common.showToast(err.message || "Failed to publish event", "error");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "Publish to Calendar";
+        }
+      }
+    });
+  }
+});

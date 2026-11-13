@@ -24,11 +24,15 @@ public class FileStorageService {
     private final Path baseStorageLocation;
 
     private static final Set<String> ALLOWED_MATERIAL_EXTENSIONS = new HashSet<>(
-            Arrays.asList("pdf", "ppt", "pptx")
+            Arrays.asList("pdf", "ppt", "pptx", "doc", "docx", "txt", "jpg", "jpeg", "png", "zip", "mp4")
     );
 
     private static final Set<String> ALLOWED_ASSIGNMENT_EXTENSIONS = new HashSet<>(
             Arrays.asList("pdf", "doc", "docx", "ppt", "pptx", "txt", "zip", "png", "jpg", "jpeg")
+    );
+
+    private static final Set<String> ALLOWED_FACULTY_DOC_EXTENSIONS = new HashSet<>(
+            Arrays.asList("pdf", "doc", "docx", "jpg", "jpeg", "png")
     );
 
     private static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
@@ -40,6 +44,7 @@ public class FileStorageService {
             Files.createDirectories(this.baseStorageLocation.resolve("materials"));
             Files.createDirectories(this.baseStorageLocation.resolve("assignments"));
             Files.createDirectories(this.baseStorageLocation.resolve("submissions"));
+            Files.createDirectories(this.baseStorageLocation.resolve("faculty-docs"));
         } catch (Exception ex) {
             throw new RuntimeException("Could not create upload storage directories", ex);
         }
@@ -55,6 +60,10 @@ public class FileStorageService {
 
     public String storeSubmissionFile(MultipartFile file) {
         return storeFile(file, "submissions", ALLOWED_ASSIGNMENT_EXTENSIONS);
+    }
+
+    public String storeFacultyDocument(MultipartFile file) {
+        return storeFile(file, "faculty-docs", ALLOWED_FACULTY_DOC_EXTENSIONS);
     }
 
     private String storeFile(MultipartFile file, String subDirectory, Set<String> allowedExtensions) {

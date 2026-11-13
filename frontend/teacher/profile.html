@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Faculty Profile - Teacher Portal</title>
+    <title>Faculty Profile & Documents - Teacher Portal</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
@@ -18,60 +18,94 @@
           <span id="page-title-text" class="hidden">Faculty Profile</span>
         </div>
 
-        <main class="dashboard-content" style="max-width: 800px;">
-          <div style="margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Faculty Profile</h2>
-            <p class="text-muted" style="font-size: 0.875rem;">Your authenticated university teacher account information</p>
+        <main class="dashboard-content" style="max-width: 960px;">
+          <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: 1.5rem;">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Faculty Profile & Academic Dossier</h2>
+              <p class="text-muted" style="font-size: 0.875rem;">Manage your official university credentials, academic profile, and verified documents</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openEditProfileModal()">
+              ✏️ Edit Profile
+            </button>
           </div>
 
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Instructor Account</h3>
+          <!-- Profile Overview Card -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header flex items-center justify-between flex-wrap">
+              <h3 class="card-title">Instructor Credentials</h3>
               <span class="badge badge-success" id="teacher-profile-status">Active</span>
             </div>
             <div class="card-body">
-              <div class="flex items-center gap-4" style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+              <div class="flex items-center gap-4" style="margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color);">
                 <div class="user-avatar-circle" id="teacher-profile-avatar" style="width: 64px; height: 64px; font-size: 1.5rem;">T</div>
                 <div>
-                  <h3 id="teacher-profile-name" style="font-size: 1.25rem; font-weight: 700; color: var(--dark);">-</h3>
-                  <span class="badge badge-primary" style="margin-top: 0.25rem;">FACULTY / TEACHER</span>
+                  <h3 id="teacher-profile-name" style="font-size: 1.25rem; font-weight: 700; color: var(--dark); margin: 0;">-</h3>
+                  <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem;">
+                    <span class="badge badge-primary" id="teacher-profile-designation">ASSISTANT PROFESSOR</span>
+                    <span class="text-muted" style="font-size: 0.8rem;" id="teacher-profile-dept-sub">Galgotias University</span>
+                  </div>
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
                 <div>
-                  <label class="form-label text-muted">Teacher ID</label>
-                  <p id="teacher-profile-id" style="font-weight: 700; color: var(--primary); font-size: 1.05rem; font-family: monospace;">-</p>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Professional Faculty ID</label>
+                  <p id="teacher-profile-id" style="font-weight: 700; color: var(--primary); font-size: 1rem; font-family: monospace;">-</p>
                 </div>
 
                 <div>
-                  <label class="form-label text-muted">Employee ID</label>
-                  <p id="teacher-profile-emp-id" style="font-weight: 600; color: var(--dark); font-size: 1rem;">-</p>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Employee Code</label>
+                  <p id="teacher-profile-emp-id" style="font-weight: 600; color: var(--dark); font-size: 0.95rem;">-</p>
                 </div>
 
                 <div>
-                  <label class="form-label text-muted">Faculty Email</label>
-                  <p id="teacher-profile-email" style="font-weight: 600; color: var(--dark); font-size: 1rem;">-</p>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Official Email</label>
+                  <p id="teacher-profile-email" style="font-weight: 600; color: var(--dark); font-size: 0.95rem;">-</p>
                 </div>
 
                 <div>
-                  <label class="form-label text-muted">Faculty Role</label>
-                  <p style="font-weight: 600; color: var(--primary); font-size: 1rem;">TEACHER</p>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Phone Number</label>
+                  <p id="teacher-profile-phone" style="font-weight: 600; color: var(--dark); font-size: 0.95rem;">Not Provided</p>
                 </div>
 
                 <div>
-                  <label class="form-label text-muted">Institution</label>
-                  <p style="font-weight: 600; color: var(--dark); font-size: 1rem;">Galgotias University</p>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Highest Qualification</label>
+                  <p id="teacher-profile-qualification" style="font-weight: 600; color: var(--dark); font-size: 0.95rem;">M.Tech / Ph.D.</p>
                 </div>
 
                 <div>
-                  <label class="form-label text-muted">Department</label>
-                  <p style="font-weight: 600; color: var(--dark); font-size: 1rem;">Computer Science & Engineering</p>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Academic Specialization</label>
+                  <p id="teacher-profile-specialization" style="font-weight: 600; color: var(--dark); font-size: 0.95rem;">Computer Science & Engineering</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Department / School</label>
+                  <p id="teacher-profile-department" style="font-weight: 600; color: var(--dark); font-size: 0.95rem;">School of Computing Science</p>
+                </div>
+
+                <div>
+                  <label class="form-label text-muted" style="font-size: 0.75rem;">Joining Date</label>
+                  <p id="teacher-profile-joining" style="font-weight: 600; color: var(--dark); font-size: 0.95rem;">-</p>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div class="alert alert-info" style="margin-top: 2rem; margin-bottom: 0;">
-                <span>🔒 Secure authentication managed via Spring Security. Sensitive credentials and passwords are strictly filtered out by the backend.</span>
+          <!-- Faculty Private Documents Section -->
+          <div class="card">
+            <div class="card-header flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 class="card-title">📁 Faculty Verified Documents & Dossier</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Upload your Curriculum Vitae, degree certificates, experience letters, and research publications</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="openUploadDocModal()">
+                + Upload Document
+              </button>
+            </div>
+            <div class="card-body" id="faculty-docs-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading faculty documents from MariaDB...</p>
               </div>
             </div>
           </div>
@@ -79,6 +113,117 @@
       </div>
     </div>
 
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="edit-profile-modal">
+      <div class="modal-container" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Edit Faculty Dossier</h3>
+          <button class="modal-close" onclick="window.common.closeModal('edit-profile-modal')">&times;</button>
+        </div>
+        <form id="edit-profile-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label required" for="edit-name">Full Name</label>
+              <input type="text" id="edit-name" class="form-input" required />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="edit-phone">Phone Number</label>
+                <input type="text" id="edit-phone" class="form-input" placeholder="+91 9876543210" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="edit-designation">Designation</label>
+                <input type="text" id="edit-designation" class="form-input" placeholder="e.g. Associate Professor" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="edit-qualification">Qualification</label>
+                <input type="text" id="edit-qualification" class="form-input" placeholder="e.g. Ph.D. in Computer Science" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="edit-specialization">Specialization</label>
+                <input type="text" id="edit-specialization" class="form-input" placeholder="e.g. Artificial Intelligence, Cloud" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-joining">Joining Date</label>
+              <input type="date" id="edit-joining" class="form-input" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('edit-profile-modal')">Cancel</button>
+            <button type="submit" id="save-profile-btn" class="btn btn-primary">Save Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Upload Faculty Document Modal -->
+    <div class="modal-overlay" id="upload-doc-modal">
+      <div class="modal-container" style="max-width: 550px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Upload Faculty Document</h3>
+          <button class="modal-close" onclick="window.common.closeModal('upload-doc-modal')">&times;</button>
+        </div>
+        <form id="upload-doc-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label required" for="doc-type-select">Document Type</label>
+              <select id="doc-type-select" class="form-input" required>
+                <option value="RESUME">📄 Curriculum Vitae (CV) / Resume</option>
+                <option value="ACADEMIC_RECORD">🎓 Academic Degree / Transcript</option>
+                <option value="CERTIFICATE">🏅 Professional Certificate</option>
+                <option value="EXPERIENCE_LETTER">💼 Experience Letter / Appointment</option>
+                <option value="RESEARCH_PAPER">🔬 Research Publication / Patent</option>
+                <option value="OTHER">📁 Other Supporting Document</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="doc-title-input">Document Title</label>
+              <input type="text" id="doc-title-input" class="form-input" placeholder="e.g. Updated CV 2026 or Ph.D. Degree" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="doc-desc-input">Description / Remarks</label>
+              <textarea id="doc-desc-input" class="form-textarea" rows="2" placeholder="Optional notes for administration..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required" for="doc-file-input">Select File</label>
+              <input type="file" id="doc-file-input" class="form-input" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" required />
+              <p class="form-help">Supported: PDF, DOCX, DOC, PNG, JPG (Max 50MB)</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('upload-doc-modal')">Cancel</button>
+            <button type="submit" id="save-doc-btn" class="btn btn-primary">Upload Document</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Document Preview Modal -->
+    <div class="modal-overlay" id="doc-preview-modal">
+      <div class="modal-container" style="max-width: 850px; width: 95vw; height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="doc-preview-title">Document Preview</h3>
+          <button class="modal-close" onclick="window.common.closeModal('doc-preview-modal')">&times;</button>
+        </div>
+        <div class="modal-body" style="flex: 1; padding: 0; background: #525659;" id="doc-preview-body"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="window.common.closeModal('doc-preview-modal')">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>

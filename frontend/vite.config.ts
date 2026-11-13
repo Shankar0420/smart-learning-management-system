@@ -25,6 +25,7 @@ export default defineConfig(() => {
 
           studentDashboard: path.resolve(rootDir, 'student/dashboard.html'),
           studentCourses: path.resolve(rootDir, 'student/courses.html'),
+          studentStudyMaterials: path.resolve(rootDir, 'student/study-materials.html'),
           studentCourseDetails: path.resolve(rootDir, 'student/course-details.html'),
           studentLearning: path.resolve(rootDir, 'student/learning.html'),
           studentQuiz: path.resolve(rootDir, 'student/quiz.html'),

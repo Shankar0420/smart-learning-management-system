@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 public class AiAssistantService {
@@ -40,6 +41,56 @@ public class AiAssistantService {
         // High-fidelity Galgotias LMS Academic Knowledge Engine
         String smartReply = generateAcademicFallbackResponse(prompt, request.getContext());
         return new AiChatResponse(smartReply, "GUL-Buddy-Academic-v2", true);
+    }
+
+    public List<Map<String, Object>> generateQuizQuestions(String topic, String subject, String difficulty, int count, String questionType) {
+        int safeCount = Math.max(1, Math.min(count, 10));
+        String targetTopic = (topic != null && !topic.isBlank()) ? topic.trim() : (subject != null ? subject.trim() : "Computer Science");
+        String diff = (difficulty != null && !difficulty.isBlank()) ? difficulty.toUpperCase() : "MEDIUM";
+        String type = (questionType != null && !questionType.isBlank()) ? questionType.toUpperCase() : "MCQ";
+
+        List<Map<String, Object>> questions = new ArrayList<>();
+
+        for (int i = 1; i <= safeCount; i++) {
+            Map<String, Object> q = new HashMap<>();
+            q.put("marks", 2);
+            q.put("questionType", type);
+
+            if (type.equals("TRUE_FALSE")) {
+                q.put("questionText", "True or False: In " + targetTopic + ", dynamic memory allocation is managed at compile time.");
+                q.put("explanation", "Dynamic memory allocation occurs at runtime on the heap, not at compile time.");
+                List<Map<String, Object>> options = List.of(
+                        Map.of("optionText", "True", "correct", false),
+                        Map.of("optionText", "False", "correct", true)
+                );
+                q.put("options", options);
+            } else if (type.equals("SHORT_ANSWER")) {
+                q.put("questionText", "Define the primary purpose and time complexity of binary search in " + targetTopic + ".");
+                q.put("explanation", "Binary search finds an element in a sorted collection in O(log n) time by repeatedly halving the search interval.");
+                List<Map<String, Object>> options = List.of(
+                        Map.of("optionText", "Logarithmic time O(log n)", "correct", true),
+                        Map.of("optionText", "Linear time O(n)", "correct", false),
+                        Map.of("optionText", "Constant time O(1)", "correct", false),
+                        Map.of("optionText", "Quadratic time O(n^2)", "correct", false)
+                );
+                q.put("options", options);
+            } else {
+                // MCQ standard
+                q.put("questionText", String.format("In %s (%s Level, Q%d): Which of the following best describes the core principle of this concept?", targetTopic, diff, i));
+                q.put("explanation", "This foundational concept ensures optimal modularity, encapsulation, and resource management in " + targetTopic + ".");
+                List<Map<String, Object>> options = List.of(
+                        Map.of("optionText", "Option A: Provides high cohesion and loose coupling across components", "correct", true),
+                        Map.of("optionText", "Option B: Directly couples all internal state to external consumers", "correct", false),
+                        Map.of("optionText", "Option C: Eliminates runtime thread concurrency entirely", "correct", false),
+                        Map.of("optionText", "Option D: Bypasses error handling mechanisms for speed", "correct", false)
+                );
+                q.put("options", options);
+            }
+
+            questions.add(q);
+        }
+
+        return questions;
     }
 
     private String callGeminiApi(String prompt, String context) throws Exception {
@@ -71,7 +122,6 @@ public class AiAssistantService {
                     resp.append(line);
                 }
             }
-            // Parse text candidate from JSON
             String json = resp.toString();
             int textIdx = json.indexOf("\"text\": \"");
             if (textIdx != -1) {
@@ -94,7 +144,7 @@ public class AiAssistantService {
             return "Hello! I am **GUL Buddy**, your Galgotias LMS academic study companion. 🎓\n\n" +
                     "I can help you with:\n" +
                     "- **Explaining technical & engineering concepts** (Java, Spring, Data Structures, DBs, Algorithms)\n" +
-                    "- **Breaking down difficult lecture topics**\n" +
+                    "- **Breaking down difficult lecture topics and study materials**\n" +
                     "- **Structuring your assignment solutions & revision plans**\n" +
                     "- **Generating practice quiz questions for upcoming exams**\n\n" +
                     "What subject or topic are you working on today?";
@@ -136,13 +186,12 @@ public class AiAssistantService {
                     "Check your live attendance breakdown on your **Student Dashboard** under the **Attendance Tracker**!";
         }
 
-        return "### 💡 Study Insight on \"" + prompt + "\"\n\n" +
+        return "### 💡 Academic Insight on \"" + prompt + "\"\n\n" +
                 "To master this academic topic systematically:\n" +
                 "1. **Core Concept:** Understand the foundational theory and problem definition first before jumping to complex implementations.\n" +
                 "2. **Hands-on Application:** Implement a small prototype or write down step-by-step notes.\n" +
                 "3. **Course Materials:** Check your course's **Study Materials** section for professor PPTs and reference PDFs.\n" +
-                "4. **Clarifications:** You can also ask your course faculty directly or discuss with peers!\n\n" +
+                "4. **Clarifications:** You can also ask your course faculty directly or post in the **Discussion Forum**!\n\n" +
                 "*Feel free to ask a more specific question, e.g., 'Explain database indexing' or 'Generate 3 Java quiz questions'!*";
     }
 }
-

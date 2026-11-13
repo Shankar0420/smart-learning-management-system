@@ -27,9 +27,14 @@
               </h2>
             </div>
 
-            <button class="btn btn-primary" onclick="openCreateQuizModal()">
-              + Create New Quiz
-            </button>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button class="btn btn-secondary" onclick="openAiQuizModal()" style="border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; font-weight: 600;">
+                ✨ Generate with GUL AI
+              </button>
+              <button class="btn btn-primary" onclick="openCreateQuizModal()">
+                + Create New Quiz
+              </button>
+            </div>
           </div>
 
           <div id="quiz-mgmt-error" class="alert alert-danger hidden"></div>
@@ -45,7 +50,7 @@
       </div>
     </div>
 
-    <!-- Create Quiz Modal -->
+    <!-- Create / Edit Quiz Modal -->
     <div class="modal-overlay" id="quiz-modal">
       <div class="modal-container">
         <div class="modal-header">
@@ -64,12 +69,120 @@
                 required
               />
             </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="quiz-timer-input">Time Limit (Minutes)</label>
+                <input
+                  type="number"
+                  id="quiz-timer-input"
+                  class="form-input"
+                  placeholder="e.g. 20"
+                  min="1"
+                  max="300"
+                  value="20"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="quiz-semester-select">Target Semester</label>
+                <select id="quiz-semester-select" class="form-input">
+                  <option value="1">Semester 1</option>
+                  <option value="2">Semester 2</option>
+                  <option value="3">Semester 3</option>
+                  <option value="4">Semester 4</option>
+                  <option value="5">Semester 5</option>
+                  <option value="6">Semester 6</option>
+                  <option value="7">Semester 7</option>
+                  <option value="8">Semester 8</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                <input type="checkbox" id="quiz-negative-marking-input" />
+                <span style="font-size: 0.875rem; font-weight: 500;">Enable Negative Marking (-0.25 marks for incorrect options)</span>
+              </label>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('quiz-modal')">Cancel</button>
             <button type="submit" id="save-quiz-btn" class="btn btn-primary">Save Quiz</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- AI Quiz Generator Modal -->
+    <div class="modal-overlay" id="ai-quiz-modal">
+      <div class="modal-container" style="max-width: 780px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">✨</span>
+            <h3 class="modal-title" style="color: white; margin: 0;">GUL AI Quiz Generator</h3>
+          </div>
+          <button class="modal-close" style="color: white;" onclick="window.common.closeModal('ai-quiz-modal')">&times;</button>
+        </div>
+        <div class="modal-body" style="flex: 1; overflow-y: auto;">
+          <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #1e40af;">
+            Generate university-grade examination questions using Galgotias AI. Review, customize, and import directly into your course quiz bank.
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label required" for="ai-quiz-topic">Academic Topic or Subject</label>
+              <input type="text" id="ai-quiz-topic" class="form-input" placeholder="e.g. Operating Systems: Deadlocks & Synchronization" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="ai-quiz-difficulty">Difficulty Level</label>
+              <select id="ai-quiz-difficulty" class="form-input">
+                <option value="Easy">Easy (Conceptual)</option>
+                <option value="Medium" selected>Medium (Standard)</option>
+                <option value="Hard">Hard (Analytical)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="ai-quiz-type">Question Format</label>
+              <select id="ai-quiz-type" class="form-input">
+                <option value="MULTIPLE_CHOICE" selected>Multiple Choice (MCQ)</option>
+                <option value="TRUE_FALSE">True / False</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="ai-quiz-count">Number of Questions</label>
+              <select id="ai-quiz-count" class="form-input">
+                <option value="3">3 Questions</option>
+                <option value="5" selected>5 Questions</option>
+                <option value="8">8 Questions</option>
+                <option value="10">10 Questions</option>
+              </select>
+            </div>
+
+            <div style="display: flex; align-items: flex-end;">
+              <button class="btn btn-primary" id="btn-run-ai-generate" style="width: 100%;" onclick="window.runAiQuizGeneration()">
+                🚀 Generate
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Generation Results Section -->
+          <div id="ai-generation-results-area" style="margin-top: 1rem;"></div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <span id="ai-selected-count-text" class="text-muted" style="font-size: 0.82rem;">0 questions generated</span>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('ai-quiz-modal')">Close</button>
+            <button type="button" id="btn-import-ai-quiz" class="btn btn-primary hidden" onclick="window.importAiQuestionsToQuiz()">
+              📥 Import Selected into Quiz
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 

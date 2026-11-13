@@ -159,14 +159,33 @@
             </div>
           </div>
 
+          <!-- University Academic Calendar & Upcoming Schedule -->
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 class="card-title">📅 Academic Calendar & Semester Timeline</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Official Galgotias University semester dates, examination schedules, and holidays</p>
+              </div>
+            </div>
+            <div class="card-body" id="student-calendar-container" style="padding: 1.25rem;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading academic calendar...</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Recent Study Materials Section -->
           <div class="card">
-            <div class="card-header">
+            <div class="card-header flex items-center justify-between flex-wrap">
               <div>
                 <h3 class="card-title">Recent Course Study Materials</h3>
                 <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Download course slides, PDFs, and revision decks</p>
               </div>
-              <a href="/student/courses.html" class="btn btn-outline btn-sm">View Enrolled Courses</a>
+              <div style="display: flex; gap: 0.5rem;">
+                <a href="/student/study-materials.html" class="btn btn-primary btn-sm">Browse All Materials</a>
+                <a href="/student/courses.html" class="btn btn-outline btn-sm">View Enrolled Courses</a>
+              </div>
             </div>
             <div class="card-body" id="recent-materials-container" style="padding: 0;">
               <div class="loading-container">

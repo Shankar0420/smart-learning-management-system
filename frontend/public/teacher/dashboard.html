@@ -151,6 +151,25 @@
             </div>
           </div>
 
+          <!-- Academic Calendar Management Section -->
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 class="card-title">📅 Academic Calendar & Examination Timelines</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Manage university exam dates, assignment submission deadlines, and holidays</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="openAddEventModal()">
+                + Add Academic Event
+              </button>
+            </div>
+            <div class="card-body" id="teacher-calendar-container" style="padding: 1.25rem;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading academic events...</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Recent Courses Overview -->
           <div class="card">
             <div class="card-header">
@@ -234,6 +253,65 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('teacher-attendance-modal')">Cancel</button>
             <button type="submit" class="btn btn-primary" id="att-submit-btn">Save Session</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Add Academic Event -->
+    <div class="modal-overlay" id="add-calendar-event-modal">
+      <div class="modal-container" style="max-width: 550px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Schedule Academic Event</h3>
+          <button class="modal-close" onclick="window.common.closeModal('add-calendar-event-modal')">&times;</button>
+        </div>
+        <form id="add-calendar-event-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label required" for="event-title-input">Event Title</label>
+              <input type="text" id="event-title-input" class="form-input" placeholder="e.g. End Semester Practical Examination" required />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label required" for="event-type-select">Event Category</label>
+                <select id="event-type-select" class="form-input" required>
+                  <option value="EXAM">📝 Examination</option>
+                  <option value="INTERNAL_ASSESSMENT">📊 Internal Assessment / Mid-Term</option>
+                  <option value="ASSIGNMENT_DEADLINE">⏱️ Assignment Submission</option>
+                  <option value="HOLIDAY">🏖️ University Holiday</option>
+                  <option value="EVENT">📌 Academic Event / Workshop</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-course-select">Associated Course</label>
+                <select id="event-course-select" class="form-input">
+                  <option value="">General (All Students)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label required" for="event-start-date">Start Date & Time</label>
+                <input type="datetime-local" id="event-start-date" class="form-input" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="event-end-date">End Date & Time</label>
+                <input type="datetime-local" id="event-end-date" class="form-input" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-desc-input">Description / Guidelines</label>
+              <textarea id="event-desc-input" class="form-textarea" rows="2" placeholder="Venue details, room numbers, or syllabus units covered..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('add-calendar-event-modal')">Cancel</button>
+            <button type="submit" id="save-calendar-event-btn" class="btn btn-primary">Publish to Calendar</button>
           </div>
         </form>
       </div>

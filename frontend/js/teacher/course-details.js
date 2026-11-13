@@ -263,6 +263,12 @@ function setupModalForms() {
         const formData = new FormData();
         formData.append("title", title);
         if (desc) formData.append("description", desc);
+        const cat = document.getElementById("material-category-select")?.value || "LECTURE_NOTES";
+        const sem = document.getElementById("material-semester-input")?.value || "1";
+        const acYear = document.getElementById("material-academic-year-input")?.value || "2026-2027";
+        formData.append("category", cat);
+        formData.append("semester", sem);
+        formData.append("academicYear", acYear);
         formData.append("file", fileInput.files[0]);
 
         await window.api.post(`/api/courses/${courseId}/materials`, formData);
@@ -278,7 +284,41 @@ function setupModalForms() {
       }
     });
   }
+
+  // Replace File Form
+  const replaceForm = document.getElementById("replace-file-form");
+  if (replaceForm) {
+    replaceForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("replace-file-input");
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        window.common.showToast("Please choose a replacement file.", "warning");
+        return;
+      }
+
+      const btn = document.getElementById("submit-replace-file-btn");
+      btn.disabled = true;
+      btn.innerText = "Replacing...";
+
+      try {
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        await window.api.post(`/api/materials/${window._activeReplaceMaterialId}/replace-file`, formData);
+        window.common.showToast("File replaced successfully!", "success");
+        window.common.closeModal("replace-file-modal");
+        replaceForm.reset();
+        await loadMaterials();
+      } catch (err) {
+        window.common.showToast(err.message || "Failed to replace file", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Update File";
+      }
+    });
+  }
 }
+
+let allLoadedMaterials = [];
 
 async function loadMaterials() {
   const container = document.getElementById("materials-container");
@@ -288,13 +328,14 @@ async function loadMaterials() {
   try {
     const materials = await window.api.get(`/api/courses/${courseId}/materials`);
     const list = Array.isArray(materials) ? materials : [];
+    allLoadedMaterials = list;
     if (countBadge) countBadge.innerText = `${list.length} File${list.length === 1 ? '' : 's'}`;
 
     if (list.length === 0) {
       window.common.renderEmptyState(
         container,
         "No Study Materials Yet",
-        "Upload presentations and documents (PPT, PPTX, PDF) for students enrolled in this course.",
+        "Upload presentations, lecture notes, lab sheets, and reference materials (PDF, PPT, DOC, ZIP, MP4) for students.",
         '<button class="btn btn-primary btn-sm" onclick="openUploadMaterialModal()">+ Upload Material</button>'
       );
       return;
@@ -305,25 +346,29 @@ async function loadMaterials() {
         <table class="table">
           <thead>
             <tr>
-              <th>Format</th>
+              <th>Format & Category</th>
               <th>Material Title</th>
               <th>Original File</th>
-              <th>Size</th>
+              <th>Engagement</th>
               <th>Uploaded Date</th>
               <th style="text-align: right;">Actions</th>
             </tr>
           </thead>
           <tbody>
             ${list.map(m => {
-              const fileType = (m.fileType || "PDF").toUpperCase();
-              const badgeClass = fileType.includes("PPT") ? "badge-warning" : "badge-danger";
+              const ext = (m.fileName || m.fileUrl || "pdf").split(".").pop().toUpperCase();
+              const catLabel = (m.category || "LECTURE_NOTES").replace(/_/g, " ");
               const sizeKB = Math.round((m.fileSize || 0) / 1024);
               const sizeStr = sizeKB > 1024 ? (sizeKB / 1024).toFixed(1) + " MB" : sizeKB + " KB";
 
               return `
                 <tr>
                   <td>
-                    <span class="badge ${badgeClass}" style="font-weight: 700;">${fileType}</span>
+                    <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                      <span class="badge badge-info" style="font-weight: 700; font-size: 0.72rem;">${ext}</span>
+                      <span class="badge badge-neutral" style="font-size: 0.7rem;">${window.common.escapeHTML(catLabel)}</span>
+                      ${m.semester ? `<span class="badge" style="background:#e0e7ff; color:#3730a3; font-size: 0.7rem;">Sem ${m.semester}</span>` : ""}
+                    </div>
                   </td>
                   <td>
                     <strong>${window.common.escapeHTML(m.title)}</strong>
@@ -331,17 +376,29 @@ async function loadMaterials() {
                   </td>
                   <td>
                     <code style="font-size: 0.75rem; background: rgba(37,99,235,0.08); color: var(--primary); padding: 0.1rem 0.35rem; border-radius: 4px;">
-                      ${window.common.escapeHTML(m.originalFileName || "document")}
+                      ${window.common.escapeHTML(m.fileName || m.originalFileName || "document")}
                     </code>
+                    <div class="text-muted" style="font-size: 0.72rem; margin-top: 2px;">${sizeStr}</div>
                   </td>
-                  <td class="text-muted tabular-nums">${sizeStr}</td>
-                  <td class="text-muted tabular-nums">${window.common.formatDate(m.createdAt)}</td>
+                  <td>
+                    <div style="font-size: 0.75rem; color: #64748b;">
+                      <span>👁️ ${m.viewCount || 0} views</span><br/>
+                      <span>⬇️ ${m.downloadCount || 0} downloads</span>
+                    </div>
+                  </td>
+                  <td class="text-muted tabular-nums" style="font-size: 0.78rem;">${window.common.formatDate(m.createdAt)}</td>
                   <td style="text-align: right;">
-                    <div class="flex items-center justify-end gap-2">
-                      <button class="btn btn-secondary btn-sm" onclick="handleDownloadMaterial('${m.id}', '${window.common.escapeHTML(m.originalFileName || 'material')}')">
-                        ⬇ Download
+                    <div class="flex items-center justify-end gap-2" style="flex-wrap: wrap;">
+                      <button class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="handlePreviewMaterial(${m.id})">
+                        👁️ Preview
                       </button>
-                      <button class="btn btn-danger-outline btn-sm" onclick="handleDeleteMaterial('${m.id}', '${window.common.escapeHTML(m.title)}')">
+                      <button class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="openReplaceFileModal(${m.id}, '${window.common.escapeHTML(m.title)}')">
+                        🔄 Replace
+                      </button>
+                      <button class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="handleDownloadMaterial(${m.id}, '${window.common.escapeHTML(m.fileName || 'material')}')">
+                        ⬇️ Download
+                      </button>
+                      <button class="btn btn-danger-outline btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="handleDeleteMaterial(${m.id}, '${window.common.escapeHTML(m.title)}')">
                         ✕ Delete
                       </button>
                     </div>
@@ -364,12 +421,52 @@ window.openUploadMaterialModal = function() {
   window.common.openModal("material-modal");
 };
 
-window.handleDownloadMaterial = async function(materialId, filename) {
-  try {
-    await window.api.download(`/api/materials/${materialId}/download`, filename);
-  } catch (err) {
-    window.common.showToast(err.message || "Failed to download material", "error");
+window.openReplaceFileModal = function(materialId, title) {
+  window._activeReplaceMaterialId = materialId;
+  const infoEl = document.getElementById("replace-file-modal-info");
+  if (infoEl) {
+    infoEl.innerHTML = `Replacing file for: <strong>${window.common.escapeHTML(title)}</strong>. The document URL and title will be preserved.`;
   }
+  const form = document.getElementById("replace-file-form");
+  if (form) form.reset();
+  window.common.openModal("replace-file-modal");
+};
+
+window.handlePreviewMaterial = function(materialId) {
+  const material = allLoadedMaterials.find(m => m.id === materialId);
+  const title = material ? material.title : "Document Preview";
+  const ext = (material?.fileName || material?.fileUrl || "pdf").split(".").pop().toLowerCase();
+  const baseUrl = window.APP_CONFIG.getApiBaseUrl();
+
+  const titleEl = document.getElementById("teacher-preview-title");
+  const bodyEl = document.getElementById("teacher-preview-body");
+  if (titleEl) titleEl.innerText = title;
+
+  const previewUrl = `${baseUrl}/api/materials/${materialId}/preview`;
+
+  if (ext === "pdf") {
+    bodyEl.innerHTML = `<iframe src="${previewUrl}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+  } else if (["jpg", "jpeg", "png", "webp", "gif"].includes(ext)) {
+    bodyEl.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; background:#0f172a;"><img src="${previewUrl}" style="max-width:100%; max-height:100%; object-fit:contain;"/></div>`;
+  } else {
+    bodyEl.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: white; gap: 1rem; padding: 2rem; text-align: center;">
+        <div style="font-size: 3rem;">📄</div>
+        <h3>${window.common.escapeHTML(title)}</h3>
+        <p style="color: #cbd5e1; max-width: 480px; font-size: 0.9rem;">
+          Inline browser preview is active for PDFs and images. For ${ext.toUpperCase()} presentations and archives, download the file to inspect.
+        </p>
+        <button class="btn btn-primary" onclick="handleDownloadMaterial(${materialId}, '${window.common.escapeHTML(material?.fileName || 'document')}')">⬇️ Download File</button>
+      </div>
+    `;
+  }
+
+  window.common.openModal("teacher-preview-modal");
+};
+
+window.handleDownloadMaterial = function(materialId) {
+  const baseUrl = window.APP_CONFIG.getApiBaseUrl();
+  window.open(`${baseUrl}/api/materials/${materialId}/download`, "_blank");
 };
 
 window.handleDeleteMaterial = function(materialId, title) {

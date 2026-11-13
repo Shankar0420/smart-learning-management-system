@@ -149,7 +149,7 @@
 
     <!-- Upload Study Material Modal -->
     <div class="modal-overlay" id="material-modal">
-      <div class="modal-container" style="max-width: 560px;">
+      <div class="modal-container" style="max-width: 600px;">
         <div class="modal-header">
           <h3 class="modal-title">Upload Study Material</h3>
           <button class="modal-close" onclick="window.common.closeModal('material-modal')">&times;</button>
@@ -167,26 +167,59 @@
               />
             </div>
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label required" for="material-category-select">Category</label>
+                <select id="material-category-select" class="form-input" required>
+                  <option value="LECTURE_NOTES">📑 Lecture Notes</option>
+                  <option value="PRESENTATION">📽️ Presentation / Slides</option>
+                  <option value="REFERENCE_BOOK">📖 Reference Book</option>
+                  <option value="PREVIOUS_YEAR_QUESTIONS">📝 Previous Year Questions</option>
+                  <option value="LAB_MANUAL">🔬 Lab Manual</option>
+                  <option value="SYLLABUS">📢 Syllabus</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="material-semester-input">Semester</label>
+                <select id="material-semester-input" class="form-input">
+                  <option value="1">Semester 1</option>
+                  <option value="2">Semester 2</option>
+                  <option value="3">Semester 3</option>
+                  <option value="4">Semester 4</option>
+                  <option value="5">Semester 5</option>
+                  <option value="6">Semester 6</option>
+                  <option value="7">Semester 7</option>
+                  <option value="8">Semester 8</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="material-academic-year-input">Academic Year</label>
+              <input type="text" id="material-academic-year-input" class="form-input" value="2026-2027" placeholder="e.g. 2026-2027" />
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="material-desc-input">Description / Topic Notes</label>
               <textarea
                 id="material-desc-input"
                 class="form-textarea"
-                rows="3"
+                rows="2"
                 placeholder="Optional notes or instructions for students..."
               ></textarea>
             </div>
 
             <div class="form-group">
-              <label class="form-label required" for="material-file-input">Select File (PPT, PPTX, or PDF)</label>
+              <label class="form-label required" for="material-file-input">Select File</label>
               <input
                 type="file"
                 id="material-file-input"
                 class="form-input"
-                accept=".pdf,.ppt,.pptx"
+                accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.png,.jpg,.jpeg,.zip,.mp4"
                 required
               />
-              <p class="form-help">Supported formats: PDF (.pdf), PowerPoint (.ppt, .pptx). Max size: 50MB.</p>
+              <p class="form-help">Supported formats: PDF, PPT, PPTX, DOC, DOCX, TXT, PNG, JPG, ZIP, MP4. Max size: 50MB.</p>
             </div>
           </div>
           <div class="modal-footer">
@@ -194,6 +227,45 @@
             <button type="submit" id="upload-material-btn" class="btn btn-primary">Upload Material</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Replace File Modal -->
+    <div class="modal-overlay" id="replace-file-modal">
+      <div class="modal-container" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Replace Material File</h3>
+          <button class="modal-close" onclick="window.common.closeModal('replace-file-modal')">&times;</button>
+        </div>
+        <form id="replace-file-form">
+          <div class="modal-body">
+            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 1rem;" id="replace-file-modal-info">
+              Upload a new revised document version. The title, category and link will be preserved.
+            </p>
+            <div class="form-group">
+              <label class="form-label required" for="replace-file-input">New File</label>
+              <input type="file" id="replace-file-input" class="form-input" accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.png,.jpg,.jpeg,.zip,.mp4" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="window.common.closeModal('replace-file-modal')">Cancel</button>
+            <button type="submit" id="submit-replace-file-btn" class="btn btn-primary">Update File</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Teacher Preview Modal -->
+    <div class="modal-overlay" id="teacher-preview-modal">
+      <div class="modal-container" style="max-width: 900px; width: 95vw; height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="teacher-preview-title">Document Preview</h3>
+          <button class="modal-close" onclick="window.common.closeModal('teacher-preview-modal')">&times;</button>
+        </div>
+        <div class="modal-body" style="flex: 1; padding: 0; position: relative; background: #525659; overflow: hidden;" id="teacher-preview-body"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="window.common.closeModal('teacher-preview-modal')">Close</button>
+        </div>
       </div>
     </div>
 

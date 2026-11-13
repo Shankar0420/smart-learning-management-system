@@ -411,6 +411,34 @@ window.openUserProfileModal = function(userId) {
         <strong>${window.common.escapeHTML(dept)}</strong>
       </div>
 
+      ${u.phone ? `
+        <div style="background: var(--bg-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <span class="text-muted" style="display: block; font-size: 0.75rem;">Phone Number</span>
+          <strong>${window.common.escapeHTML(u.phone)}</strong>
+        </div>
+      ` : ''}
+
+      ${u.designation ? `
+        <div style="background: var(--bg-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <span class="text-muted" style="display: block; font-size: 0.75rem;">Designation</span>
+          <strong>${window.common.escapeHTML(u.designation)}</strong>
+        </div>
+      ` : ''}
+
+      ${u.qualification ? `
+        <div style="background: var(--bg-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <span class="text-muted" style="display: block; font-size: 0.75rem;">Qualification</span>
+          <strong>${window.common.escapeHTML(u.qualification)}</strong>
+        </div>
+      ` : ''}
+
+      ${u.specialization ? `
+        <div style="background: var(--bg-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <span class="text-muted" style="display: block; font-size: 0.75rem;">Specialization</span>
+          <strong>${window.common.escapeHTML(u.specialization)}</strong>
+        </div>
+      ` : ''}
+
       <div style="background: var(--bg-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
         <span class="text-muted" style="display: block; font-size: 0.75rem;">Registration Date</span>
         <strong class="tabular-nums">${window.common.formatDate(date)}</strong>

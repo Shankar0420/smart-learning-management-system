@@ -151,24 +151,25 @@ function initDashboardLayout(role, activePageKey) {
     STUDENT: [
       { key: "dashboard", label: "Dashboard", href: "/student/dashboard.html", icon: "📊" },
       { key: "courses", label: "My Courses", href: "/student/courses.html", icon: "📚" },
+      { key: "study-materials", label: "Study Materials", href: "/student/study-materials.html", icon: "📑" },
       { key: "quiz", label: "Quizzes & Tests", href: "/student/quiz.html", icon: "⏱️" },
       { key: "assignments", label: "Assignments", href: "/student/assignments.html", icon: "📝" },
-      { key: "grades", label: "Grades", href: "/student/grades.html", icon: "🏅" },
+      { key: "grades", label: "Grades & Certificates", href: "/student/grades.html", icon: "🏅" },
       { key: "gul-buddy", label: "GUL Buddy AI", href: "javascript:window.common.openGulBuddy()", icon: "✨" },
       { key: "profile", label: "Profile", href: "/student/profile.html", icon: "👤" }
     ],
     TEACHER: [
       { key: "dashboard", label: "Dashboard", href: "/teacher/dashboard.html", icon: "📊" },
       { key: "courses", label: "My Courses", href: "/teacher/courses.html", icon: "📚" },
-      { key: "quizzes", label: "Quiz Bank", href: "/teacher/quiz-management.html", icon: "⏱️" },
+      { key: "quizzes", label: "Quiz Bank & AI", href: "/teacher/quiz-management.html", icon: "⏱️" },
       { key: "assignments", label: "Assignments", href: "/teacher/assignment-management.html", icon: "📝" },
       { key: "submissions", label: "Submissions", href: "/teacher/submissions.html", icon: "📥" },
       { key: "gul-buddy", label: "GUL Buddy AI", href: "javascript:window.common.openGulBuddy()", icon: "✨" },
-      { key: "profile", label: "Profile", href: "/teacher/profile.html", icon: "👤" }
+      { key: "profile", label: "Faculty Profile & Docs", href: "/teacher/profile.html", icon: "👤" }
     ],
     ADMIN: [
       { key: "dashboard", label: "Dashboard", href: "/admin/dashboard.html", icon: "📊" },
-      { key: "users", label: "User Management", href: "/admin/users.html", icon: "👥" },
+      { key: "users", label: "Users & Faculty", href: "/admin/users.html", icon: "👥" },
       { key: "courses", label: "Course Allocation", href: "/admin/courses.html", icon: "📚" },
       { key: "gul-buddy", label: "GUL Buddy AI", href: "javascript:window.common.openGulBuddy()", icon: "✨" },
       { key: "profile", label: "Admin Profile", href: "/admin/profile.html", icon: "👤" }
@@ -240,7 +241,24 @@ function initDashboardLayout(role, activePageKey) {
           </div>
         </div>
 
-        <div class="header-right">
+        <div class="header-right" style="display: flex; align-items: center; gap: 0.75rem;">
+          <!-- Notification Bell & Dropdown -->
+          <div class="notification-bell-wrap" id="notification-bell-wrap">
+            <button class="notification-bell-btn" id="notification-bell-btn" title="Notifications" aria-label="Notifications" onclick="window.common.toggleNotificationsMenu()">
+              🔔
+              <span class="notification-badge-count" id="notification-badge-count" style="display: none;">0</span>
+            </button>
+            <div class="notifications-menu" id="notifications-menu">
+              <div class="notifications-menu-header">
+                <h4>Notifications</h4>
+                <button class="btn btn-secondary btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;" onclick="window.common.markAllNotificationsRead()">Mark all read</button>
+              </div>
+              <div class="notifications-menu-list" id="notifications-menu-list">
+                <div style="padding: 1.5rem; text-align: center; color: #64748b; font-size: 0.8rem;">No new notifications</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Backend Connection Indicator (Green: connected, Red: unavailable, Yellow: checking) -->
           <div class="backend-status-indicator checking" id="backend-status-badge" title="Click to view/change backend URL" onclick="window.common.openApiConfigModal()">
             <span class="status-indicator-dot checking" id="backend-status-dot"></span>
@@ -258,6 +276,16 @@ function initDashboardLayout(role, activePageKey) {
     });
 
     startBackendHealthMonitor();
+    startNotificationMonitor();
+
+    // Close notifications menu when clicking outside
+    document.addEventListener("click", (evt) => {
+      const bellWrap = document.getElementById("notification-bell-wrap");
+      const menu = document.getElementById("notifications-menu");
+      if (menu && bellWrap && !bellWrap.contains(evt.target)) {
+        menu.classList.remove("active");
+      }
+    });
   }
 
   // Mobile Drawer Toggle
@@ -531,6 +559,108 @@ function startBackendHealthMonitor() {
   }, 35000);
 }
 
+/**
+ * Notifications Management Subsystem
+ */
+async function fetchUnreadNotificationsCount() {
+  const token = window.auth?.getToken();
+  if (!token) return;
+
+  try {
+    const res = await window.api.get("/api/notifications/unread-count");
+    const count = (res && typeof res.count === "number") ? res.count : 0;
+    const badge = document.getElementById("notification-badge-count");
+    if (badge) {
+      if (count > 0) {
+        badge.innerText = count > 99 ? "99+" : count;
+        badge.style.display = "inline-flex";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+  } catch (e) {
+    // Silently ignore network hiccup during background poll
+  }
+}
+
+async function loadNotificationsList() {
+  const listContainer = document.getElementById("notifications-menu-list");
+  if (!listContainer) return;
+
+  try {
+    const items = await window.api.get("/api/notifications");
+    if (!items || items.length === 0) {
+      listContainer.innerHTML = '<div style="padding: 1.5rem; text-align: center; color: #64748b; font-size: 0.8rem;">No notifications yet</div>';
+      return;
+    }
+
+    listContainer.innerHTML = items.slice(0, 15).map(n => `
+      <div class="notification-menu-item ${n.isRead ? "read" : "unread"}" onclick="window.common.handleNotificationClick(${n.id}, '${escapeHTML(n.link || "")}')">
+        <div class="notification-menu-item-title">${escapeHTML(n.title)}</div>
+        <div class="notification-menu-item-msg">${escapeHTML(n.message)}</div>
+        <div class="notification-menu-item-time">${formatDate(n.createdAt)}</div>
+      </div>
+    `).join("");
+  } catch (err) {
+    listContainer.innerHTML = `<div style="padding: 1rem; text-align: center; color: #ef4444; font-size: 0.8rem;">Failed to load notifications</div>`;
+  }
+}
+
+async function toggleNotificationsMenu() {
+  const menu = document.getElementById("notifications-menu");
+  if (!menu) return;
+
+  const isActive = menu.classList.contains("active");
+  if (isActive) {
+    menu.classList.remove("active");
+  } else {
+    menu.classList.add("active");
+    await loadNotificationsList();
+  }
+}
+
+async function handleNotificationClick(id, link) {
+  try {
+    await window.api.put(`/api/notifications/${id}/read`, {});
+    await fetchUnreadNotificationsCount();
+  } catch (e) {
+    // Continue navigation regardless
+  }
+
+  const menu = document.getElementById("notifications-menu");
+  if (menu) menu.classList.remove("active");
+
+  if (link && link.trim() !== "") {
+    window.location.href = link;
+  } else {
+    await loadNotificationsList();
+  }
+}
+
+async function markAllNotificationsRead() {
+  try {
+    await window.api.post("/api/notifications/read-all", {});
+    showToast("All notifications marked as read", "success");
+    await fetchUnreadNotificationsCount();
+    await loadNotificationsList();
+  } catch (e) {
+    showToast("Failed to mark notifications as read", "error");
+  }
+}
+
+function startNotificationMonitor() {
+  fetchUnreadNotificationsCount();
+
+  if (window._notificationPollInterval) {
+    clearInterval(window._notificationPollInterval);
+  }
+  window._notificationPollInterval = setInterval(() => {
+    if (document.visibilityState === "visible") {
+      fetchUnreadNotificationsCount();
+    }
+  }, 30000);
+}
+
 // Global exports
 window.common = {
   showToast,
@@ -545,6 +675,12 @@ window.common = {
   initDashboardLayout,
   openApiConfigModal,
   startBackendHealthMonitor,
+  startNotificationMonitor,
+  fetchUnreadNotificationsCount,
+  loadNotificationsList,
+  toggleNotificationsMenu,
+  handleNotificationClick,
+  markAllNotificationsRead,
   openGulBuddy,
   closeGulBuddy,
   sendQuickPrompt,

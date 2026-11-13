@@ -60,6 +60,7 @@ async function loadLearningContent() {
     updateProgressBar(progress);
     renderModulesTree();
     renderMaterialsList();
+    await loadDiscussions();
 
     // Select either the requested lesson or the first available lesson
     const firstLesson = findLesson(currentLessonId) || findFirstLesson();
@@ -270,3 +271,179 @@ window.handleDownloadMaterial = async function(materialId, filename) {
     window.common.showToast(err.message || "Failed to download material", "error");
   }
 };
+
+/**
+ * Course Discussion Forum Controller
+ */
+let currentThreadId = null;
+
+async function loadDiscussions() {
+  const container = document.getElementById("discussions-container");
+  if (!container) return;
+
+  try {
+    const threads = await window.api.get(`/api/discussions/course/${courseId}`);
+    const list = Array.isArray(threads) ? threads : [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 1.5rem; color: #64748b; font-size: 0.85rem;">
+          No discussions started for this course yet. Be the first to ask a question!
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = list.map(t => `
+      <div class="forum-thread-card ${t.pinned ? 'pinned' : ''}" onclick="window.openViewThreadModal(${t.id})">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem;">
+          <div style="display: flex; gap: 0.4rem; align-items: center;">
+            ${t.pinned ? '<span class="badge badge-warning" style="font-size: 0.7rem;">📌 PINNED</span>' : ''}
+            <h4 style="font-size: 1rem; font-weight: 700; color: #0f172a; margin: 0;">${window.common.escapeHTML(t.title)}</h4>
+          </div>
+          <span class="badge badge-neutral" style="font-size: 0.72rem;">💬 ${t.repliesCount || 0} replies</span>
+        </div>
+        <p style="font-size: 0.85rem; color: #475569; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          ${window.common.escapeHTML(t.content)}
+        </p>
+        <div style="font-size: 0.75rem; color: #94a3b8; display: flex; gap: 1rem;">
+          <span>👤 ${window.common.escapeHTML(t.userName || "Student")}</span>
+          <span>📅 ${window.common.formatDate(t.createdAt)}</span>
+        </div>
+      </div>
+    `).join("");
+  } catch (err) {
+    container.innerHTML = `<p class="text-muted" style="font-size: 0.85rem;">Discussions will load once course activity begins.</p>`;
+  }
+}
+
+window.openNewThreadModal = function() {
+  const form = document.getElementById("new-thread-form");
+  if (form) form.reset();
+  window.common.openModal("new-thread-modal");
+};
+
+window.openViewThreadModal = async function(threadId) {
+  currentThreadId = threadId;
+  const titleEl = document.getElementById("view-thread-title");
+  const metaEl = document.getElementById("view-thread-meta");
+  const bodyEl = document.getElementById("view-thread-body");
+  const repliesContainer = document.getElementById("thread-replies-list");
+  const badgeEl = document.getElementById("replies-count-badge");
+  const replyInput = document.getElementById("reply-input-text");
+
+  if (replyInput) replyInput.value = "";
+  if (titleEl) titleEl.innerText = "Loading discussion...";
+  if (bodyEl) bodyEl.innerHTML = `<div class="loading-container"><div class="spinner-primary"></div></div>`;
+  if (repliesContainer) repliesContainer.innerHTML = "";
+
+  window.common.openModal("view-thread-modal");
+
+  try {
+    const thread = await window.api.get(`/api/discussions/threads/${threadId}`);
+    if (!thread) return;
+
+    if (titleEl) titleEl.innerText = thread.title;
+    if (metaEl) {
+      metaEl.innerText = `Posted by ${thread.userName || "Student"} on ${window.common.formatDate(thread.createdAt)}`;
+    }
+    if (bodyEl) {
+      bodyEl.innerText = thread.content;
+    }
+
+    const replies = thread.replies || [];
+    if (badgeEl) badgeEl.innerText = replies.length;
+
+    if (replies.length === 0) {
+      repliesContainer.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 0.85rem; padding: 1rem;">No replies yet. Be the first to answer!</div>`;
+    } else {
+      repliesContainer.innerHTML = replies.map(r => `
+        <div class="reply-card ${r.accepted ? 'accepted' : ''}">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <strong>${window.common.escapeHTML(r.userName || "User")}</strong>
+              <span class="badge ${r.userRole === 'TEACHER' ? 'badge-primary' : 'badge-neutral'}" style="font-size: 0.68rem;">${r.userRole || 'STUDENT'}</span>
+              ${r.accepted ? '<span class="badge badge-success" style="font-size: 0.7rem;">✓ ACCEPTED ANSWER</span>' : ''}
+            </div>
+            <span style="font-size: 0.72rem; color: #94a3b8;">${window.common.formatDate(r.createdAt)}</span>
+          </div>
+          <p style="font-size: 0.88rem; color: #334155; margin: 0; line-height: 1.5;">${window.common.escapeHTML(r.content)}</p>
+          ${!r.accepted ? `
+            <div style="display: flex; justify-content: flex-end; margin-top: 0.35rem;">
+              <button class="btn btn-secondary btn-sm" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;" onclick="window.acceptReply(${r.id})">✓ Accept Answer</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join("");
+    }
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to load thread details", "error");
+  }
+};
+
+window.submitReply = async function() {
+  const replyInput = document.getElementById("reply-input-text");
+  const content = replyInput?.value.trim();
+  if (!content) {
+    window.common.showToast("Please enter your answer text", "warning");
+    return;
+  }
+
+  const btn = document.getElementById("btn-submit-reply");
+  if (btn) btn.disabled = true;
+
+  try {
+    await window.api.post(`/api/discussions/threads/${currentThreadId}/replies`, { content });
+    window.common.showToast("Reply published!", "success");
+    if (replyInput) replyInput.value = "";
+    await openViewThreadModal(currentThreadId);
+    await loadDiscussions();
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to post reply", "error");
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+};
+
+window.acceptReply = async function(replyId) {
+  try {
+    await window.api.put(`/api/discussions/replies/${replyId}/accept`, {});
+    window.common.showToast("Marked as accepted answer!", "success");
+    await openViewThreadModal(currentThreadId);
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to accept reply", "error");
+  }
+};
+
+// Form listener for new thread
+document.addEventListener("DOMContentLoaded", () => {
+  const threadForm = document.getElementById("new-thread-form");
+  if (threadForm) {
+    threadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("thread-title-input")?.value.trim();
+      const content = document.getElementById("thread-content-input")?.value.trim();
+      if (!title || !content) return;
+
+      const btn = document.getElementById("submit-thread-btn");
+      if (btn) btn.disabled = true;
+
+      try {
+        await window.api.post("/api/discussions/threads", {
+          courseId: Number(courseId),
+          title,
+          content
+        });
+
+        window.common.showToast("Question posted to course forum!", "success");
+        window.common.closeModal("new-thread-modal");
+        threadForm.reset();
+        await loadDiscussions();
+      } catch (err) {
+        window.common.showToast(err.message || "Failed to post question", "error");
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  }
+});

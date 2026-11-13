@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadStudentDashboard();
   await loadAnnouncements();
   await loadAttendanceSummary();
+  await loadAcademicCalendar();
 });
 
 async function loadStudentDashboard() {
@@ -344,5 +345,64 @@ async function loadAttendanceSummary() {
     `;
   } catch (err) {
     container.innerHTML = `<p class="text-muted" style="font-size: 0.85rem;">Attendance tracker initialized. Attendance will appear here once faculty records lecture sessions.</p>`;
+  }
+}
+
+async function loadAcademicCalendar() {
+  const container = document.getElementById("student-calendar-container");
+  if (!container) return;
+
+  try {
+    const events = await window.api.get("/api/calendar/events");
+    const list = Array.isArray(events) ? events : [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 1.5rem; color: #64748b; font-size: 0.85rem;">
+          No academic events scheduled currently.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+        ${list.map(e => {
+          const type = (e.eventType || "EVENT").toUpperCase();
+          let badgeColor = "badge-info";
+          let icon = "📌";
+          if (type === "EXAM") { badgeColor = "badge-danger"; icon = "📝"; }
+          else if (type === "HOLIDAY") { badgeColor = "badge-success"; icon = "🏖️"; }
+          else if (type === "ASSIGNMENT_DEADLINE") { badgeColor = "badge-warning"; icon = "⏱️"; }
+          else if (type === "INTERNAL_ASSESSMENT") { badgeColor = "badge-primary"; icon = "📊"; }
+
+          return `
+            <div style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+                <span class="badge ${badgeColor}" style="font-size: 0.72rem;">${icon} ${type.replace(/_/g, " ")}</span>
+                <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">
+                  ${window.common.formatDate(e.startDate).split(",")[0]}
+                </span>
+              </div>
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem;">
+                ${window.common.escapeHTML(e.title)}
+              </h4>
+              ${e.description ? `
+                <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem; line-height: 1.35;">
+                  ${window.common.escapeHTML(e.description)}
+                </p>
+              ` : ''}
+              ${e.courseTitle ? `
+                <div style="font-size: 0.75rem; color: #3b82f6; font-weight: 500;">
+                  📚 ${window.common.escapeHTML(e.courseTitle)}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `<p class="text-muted" style="font-size: 0.85rem;">Failed to load calendar events.</p>`;
   }
 }

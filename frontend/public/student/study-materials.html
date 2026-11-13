@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study Materials - Galgotias LMS</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <div id="sidebar-container"></div>
+
+      <div class="dashboard-main">
+        <div id="header-container">
+          <span id="page-title-text" class="hidden">Study Materials</span>
+        </div>
+
+        <main class="dashboard-content">
+          <!-- Page Header -->
+          <div class="flex items-center justify-between flex-wrap gap-4" style="margin-bottom: 1.5rem;">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Academic Study Materials & Resources</h2>
+              <p class="text-muted" style="font-size: 0.875rem;">Access lecture slides, textbook references, lab sheets, and question banks</p>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="card" style="margin-bottom: 1.5rem; padding: 1rem;">
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+              <div style="flex: 1; min-width: 240px;">
+                <input type="text" id="material-search-input" class="form-input" placeholder="🔍 Search materials by title, topic, or keyword..." />
+              </div>
+              <div style="width: 180px;">
+                <select id="material-semester-select" class="form-input">
+                  <option value="">All Semesters</option>
+                  <option value="1">Semester 1</option>
+                  <option value="2">Semester 2</option>
+                  <option value="3">Semester 3</option>
+                  <option value="4">Semester 4</option>
+                  <option value="5">Semester 5</option>
+                  <option value="6">Semester 6</option>
+                  <option value="7">Semester 7</option>
+                  <option value="8">Semester 8</option>
+                </select>
+              </div>
+              <button id="material-search-btn" class="btn btn-primary btn-sm">Search</button>
+              <button id="material-reset-btn" class="btn btn-secondary btn-sm">Reset</button>
+            </div>
+          </div>
+
+          <!-- Category Filter Tabs -->
+          <div class="category-tab-bar" id="category-tab-bar">
+            <button class="category-tab-btn active" data-category="ALL">All Categories</button>
+            <button class="category-tab-btn" data-category="LECTURE_NOTES">📑 Lecture Notes</button>
+            <button class="category-tab-btn" data-category="PRESENTATION">📽️ Presentations</button>
+            <button class="category-tab-btn" data-category="REFERENCE_BOOK">📖 Reference Books</button>
+            <button class="category-tab-btn" data-category="PREVIOUS_YEAR_QUESTIONS">📝 PYQs</button>
+            <button class="category-tab-btn" data-category="LAB_MANUAL">🔬 Lab Manuals</button>
+            <button class="category-tab-btn" data-category="SYLLABUS">📢 Syllabi</button>
+            <button class="category-tab-btn" data-category="BOOKMARKS">⭐ My Bookmarks</button>
+          </div>
+
+          <!-- Alert area -->
+          <div id="materials-error-area" class="alert alert-danger hidden"></div>
+
+          <!-- Materials Grid -->
+          <div id="materials-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+            <div class="loading-container" style="grid-column: 1 / -1;">
+              <div class="spinner-primary"></div>
+              <p>Loading study materials...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="material-preview-modal">
+      <div class="modal-container" style="max-width: 900px; width: 95vw; height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="preview-modal-title">Document Preview</h3>
+          <button class="modal-close" onclick="window.common.closeModal('material-preview-modal')">&times;</button>
+        </div>
+        <div class="modal-body" style="flex: 1; padding: 0; position: relative; background: #525659; overflow: hidden;" id="preview-modal-body">
+          <!-- Preview content injected here -->
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="text-muted" style="font-size: 0.8rem;" id="preview-modal-meta"></span>
+          <a id="preview-modal-download-btn" href="#" class="btn btn-primary btn-sm" target="_blank">⬇️ Download File</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/student/study-materials.js"></script>
+  </body>
+</html>

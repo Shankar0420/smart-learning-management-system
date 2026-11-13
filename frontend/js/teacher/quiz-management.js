@@ -62,6 +62,9 @@ async function loadQuizzes() {
                   <div class="flex items-center gap-2">
                     <h3 class="card-title">${window.common.escapeHTML(quiz.title || "Quiz")}</h3>
                     <span class="badge ${quiz.active ? 'badge-success' : 'badge-neutral'}">${quiz.active ? 'Published' : 'Draft'}</span>
+                    ${quiz.timeLimitMinutes ? `<span class="badge badge-info" style="font-size: 0.72rem;">⏱️ ${quiz.timeLimitMinutes} mins</span>` : ''}
+                    ${quiz.negativeMarking ? `<span class="badge badge-warning" style="font-size: 0.72rem;">⚠️ Neg (-0.25)</span>` : ''}
+                    ${quiz.semester ? `<span class="badge" style="background:#e0e7ff; color:#3730a3; font-size: 0.72rem;">Sem ${quiz.semester}</span>` : ''}
                   </div>
                   <span class="text-muted" style="font-size: 0.8rem;">${questions.length} Question${questions.length === 1 ? '' : 's'} · Total Marks: ${quiz.totalMarks || 0}</span>
                 </div>
@@ -234,15 +237,29 @@ function setupForms() {
     const title = document.getElementById("quiz-title-input").value.trim();
     if (!title) return;
 
+    const timeLimitMinutes = Number(document.getElementById("quiz-timer-input")?.value) || 20;
+    const semester = Number(document.getElementById("quiz-semester-select")?.value) || 1;
+    const negativeMarking = !!document.getElementById("quiz-negative-marking-input")?.checked;
+
     const btn = document.getElementById("save-quiz-btn");
     btn.disabled = true;
 
     try {
       if (activeQuizId) {
-        await window.api.put(`/api/quizzes/${activeQuizId}`, { title });
+        await window.api.put(`/api/quizzes/${activeQuizId}`, {
+          title,
+          timeLimitMinutes,
+          semester,
+          negativeMarking
+        });
         window.common.showToast("Quiz updated successfully!", "success");
       } else {
-        await window.api.post(`/api/courses/${courseId}/quizzes`, { title });
+        await window.api.post(`/api/courses/${courseId}/quizzes`, {
+          title,
+          timeLimitMinutes,
+          semester,
+          negativeMarking
+        });
         window.common.showToast("Quiz created successfully!", "success");
       }
       window.common.closeModal("quiz-modal");
@@ -302,3 +319,168 @@ function setupForms() {
     }
   });
 }
+
+/**
+ * GUL AI Quiz Generator Handlers
+ */
+let generatedAiQuizData = null;
+
+window.openAiQuizModal = function() {
+  const topicInput = document.getElementById("ai-quiz-topic");
+  if (topicInput && !topicInput.value) {
+    const pageTitle = document.getElementById("quiz-page-course-title")?.innerText || "";
+    topicInput.value = pageTitle.replace(/^Quizzes\s*·\s*/, "").trim();
+  }
+  document.getElementById("ai-generation-results-area").innerHTML = "";
+  document.getElementById("btn-import-ai-quiz")?.classList.add("hidden");
+  document.getElementById("ai-selected-count-text").innerText = "0 questions generated";
+  window.common.openModal("ai-quiz-modal");
+};
+
+window.runAiQuizGeneration = async function() {
+  const topic = document.getElementById("ai-quiz-topic")?.value.trim();
+  if (!topic) {
+    window.common.showToast("Please enter an academic topic", "warning");
+    return;
+  }
+
+  const difficulty = document.getElementById("ai-quiz-difficulty")?.value || "Medium";
+  const questionType = document.getElementById("ai-quiz-type")?.value || "MULTIPLE_CHOICE";
+  const count = Number(document.getElementById("ai-quiz-count")?.value) || 5;
+
+  const btn = document.getElementById("btn-run-ai-generate");
+  const resultsArea = document.getElementById("ai-generation-results-area");
+  const importBtn = document.getElementById("btn-import-ai-quiz");
+  const countText = document.getElementById("ai-selected-count-text");
+
+  btn.disabled = true;
+  btn.innerText = "Generating...";
+  resultsArea.innerHTML = `
+    <div class="loading-container">
+      <div class="spinner-primary"></div>
+      <p>Consulting GUL Academic AI for ${count} ${difficulty} questions...</p>
+    </div>
+  `;
+
+  try {
+    const res = await window.api.post("/api/quizzes/generate-ai", {
+      topic,
+      difficulty,
+      count,
+      questionType
+    });
+
+    generatedAiQuizData = res;
+    const questions = res.questions || [];
+
+    if (questions.length === 0) {
+      resultsArea.innerHTML = `<p class="text-muted" style="text-align: center; padding: 1.5rem;">No questions were returned. Try adjusting the topic.</p>`;
+      return;
+    }
+
+    resultsArea.innerHTML = `
+      <div style="margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #1e3a8a;">${window.common.escapeHTML(res.title || "Generated Questions")}</h4>
+        <span class="badge badge-success">${questions.length} Questions Ready</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        ${questions.map((q, qIdx) => `
+          <div class="card" style="padding: 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #ffffff;">
+            <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.5rem;">
+              <input type="checkbox" class="ai-q-checkbox" data-qidx="${qIdx}" checked id="ai-q-check-${qIdx}" style="margin-top: 3px;" />
+              <label for="ai-q-check-${qIdx}" style="font-weight: 600; font-size: 0.9rem; color: #0f172a; flex: 1;">
+                ${qIdx + 1}. <input type="text" class="form-input ai-q-text" data-qidx="${qIdx}" value="${window.common.escapeHTML(q.questionText)}" style="display: inline-block; width: calc(100% - 2rem); margin-left: 0.25rem; font-weight: 600;" />
+              </label>
+            </div>
+            <div style="margin-left: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.4rem; font-size: 0.82rem;">
+              ${(q.options || []).map((opt, oIdx) => `
+                <div style="padding: 0.35rem 0.6rem; border-radius: 4px; border: 1px solid ${oIdx === q.correctOptionIndex ? "#86efac" : "#e2e8f0"}; background: ${oIdx === q.correctOptionIndex ? "#f0fdf4" : "#f8fafc"};">
+                  ${oIdx === q.correctOptionIndex ? '<strong style="color: #16a34a;">✓ </strong>' : '○ '}
+                  ${window.common.escapeHTML(opt)}
+                </div>
+              `).join("")}
+            </div>
+            ${q.explanation ? `
+              <div style="margin-left: 1.5rem; margin-top: 0.4rem; font-size: 0.75rem; color: #64748b;">
+                <strong>Explanation:</strong> ${window.common.escapeHTML(q.explanation)}
+              </div>
+            ` : ''}
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    importBtn?.classList.remove("hidden");
+    countText.innerText = `${questions.length} questions generated & selected`;
+  } catch (err) {
+    resultsArea.innerHTML = `
+      <div style="padding: 1rem; color: #ef4444; background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-sm); font-size: 0.85rem;">
+        Failed to generate questions: ${window.common.escapeHTML(err.message)}
+      </div>
+    `;
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "🚀 Generate";
+  }
+};
+
+window.importAiQuestionsToQuiz = async function() {
+  if (!generatedAiQuizData || !generatedAiQuizData.questions) return;
+
+  const checkboxes = document.querySelectorAll(".ai-q-checkbox:checked");
+  if (checkboxes.length === 0) {
+    window.common.showToast("Please select at least one question to import", "warning");
+    return;
+  }
+
+  const importBtn = document.getElementById("btn-import-ai-quiz");
+  importBtn.disabled = true;
+  importBtn.innerText = "Importing...";
+
+  try {
+    // Create new Quiz
+    const quizTitle = generatedAiQuizData.title || `AI Assessment: ${document.getElementById("ai-quiz-topic")?.value.trim()}`;
+    const newQuiz = await window.api.post(`/api/courses/${courseId}/quizzes`, {
+      title: quizTitle,
+      timeLimitMinutes: 20,
+      negativeMarking: false,
+      semester: 1
+    });
+
+    const quizId = newQuiz.id;
+
+    // Import each checked question
+    for (const cb of checkboxes) {
+      const qIdx = Number(cb.getAttribute("data-qidx"));
+      const originalQ = generatedAiQuizData.questions[qIdx];
+      const editedTextInput = document.querySelector(`.ai-q-text[data-qidx="${qIdx}"]`);
+      const qText = editedTextInput ? editedTextInput.value.trim() : originalQ.questionText;
+
+      const formattedOptions = (originalQ.options || []).map((optText, oIdx) => ({
+        optionText: optText,
+        text: optText,
+        isCorrect: oIdx === originalQ.correctOptionIndex,
+        correct: oIdx === originalQ.correctOptionIndex
+      }));
+
+      await window.api.post(`/api/quizzes/${quizId}/questions`, {
+        questionText: qText,
+        text: qText,
+        marks: originalQ.marks || 1,
+        options: formattedOptions,
+        correctOptionIndex: originalQ.correctOptionIndex,
+        questionType: originalQ.questionType || "MULTIPLE_CHOICE",
+        explanation: originalQ.explanation || ""
+      });
+    }
+
+    window.common.showToast(`Imported ${checkboxes.length} questions into new quiz!`, "success");
+    window.common.closeModal("ai-quiz-modal");
+    await loadQuizzes();
+  } catch (err) {
+    window.common.showToast(err.message || "Failed to import AI questions", "error");
+  } finally {
+    importBtn.disabled = false;
+    importBtn.innerText = "📥 Import Selected into Quiz";
+  }
+};

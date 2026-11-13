@@ -16,6 +16,15 @@ public class StudyMaterialResponse {
     private String fileType; // PDF, PPT, PPTX
     private String uploaderName;
     private LocalDateTime createdAt;
+    private String category;
+    private String semester;
+    private String academicYear;
+    private String department;
+    private String subject;
+    private boolean published = true;
+    private int downloadCount = 0;
+    private int viewCount = 0;
+    private boolean bookmarked = false;
 
     public StudyMaterialResponse() {}
 
@@ -71,5 +80,32 @@ public class StudyMaterialResponse {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getSemester() { return semester; }
+    public void setSemester(String semester) { this.semester = semester; }
+
+    public String getAcademicYear() { return academicYear; }
+    public void setAcademicYear(String academicYear) { this.academicYear = academicYear; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
+
+    public boolean isPublished() { return published; }
+    public void setPublished(boolean published) { this.published = published; }
+
+    public int getDownloadCount() { return downloadCount; }
+    public void setDownloadCount(int downloadCount) { this.downloadCount = downloadCount; }
+
+    public int getViewCount() { return viewCount; }
+    public void setViewCount(int viewCount) { this.viewCount = viewCount; }
+
+    public boolean isBookmarked() { return bookmarked; }
+    public void setBookmarked(boolean bookmarked) { this.bookmarked = bookmarked; }
 }
 

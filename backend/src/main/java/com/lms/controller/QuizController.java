@@ -1,6 +1,7 @@
 package com.lms.controller;
 
 import com.lms.dto.*;
+import com.lms.service.AiAssistantService;
 import com.lms.service.QuizService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -11,15 +12,38 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quizzes")
 public class QuizController {
 
     private final QuizService quizService;
+    private final AiAssistantService aiAssistantService;
 
-    public QuizController(QuizService quizService) {
+    public QuizController(QuizService quizService, AiAssistantService aiAssistantService) {
         this.quizService = quizService;
+        this.aiAssistantService = aiAssistantService;
+    }
+
+    @PostMapping("/generate-ai")
+    @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> generateQuizWithAi(
+            @RequestBody Map<String, Object> req,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        String topic = (String) req.get("topic");
+        String subject = (String) req.get("subject");
+        String difficulty = (String) req.get("difficulty");
+        String questionType = (String) req.get("questionType");
+        int count = req.containsKey("count") && req.get("count") instanceof Number ? ((Number) req.get("count")).intValue() : 5;
+
+        List<Map<String, Object>> questions = aiAssistantService.generateQuizQuestions(topic, subject, difficulty, count, questionType);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "topic", topic != null ? topic : "General",
+                "questions", questions,
+                "message", "AI generated " + questions.size() + " review questions successfully"
+        ));
     }
 
     @GetMapping("/{id}")

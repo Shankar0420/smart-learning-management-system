@@ -28,6 +28,12 @@ public class QuizQuestion {
     @Column(nullable = false)
     private int marks = 1;
 
+    @Column(nullable = false, length = 30)
+    private String questionType = "MCQ"; // MCQ, MULTI_SELECT, TRUE_FALSE, SHORT_ANSWER
+
+    @Column(length = 1000)
+    private String explanation;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -51,6 +57,12 @@ public class QuizQuestion {
 
     public int getMarks() { return marks; }
     public void setMarks(int marks) { this.marks = marks; }
+
+    public String getQuestionType() { return questionType; }
+    public void setQuestionType(String questionType) { this.questionType = questionType != null ? questionType : "MCQ"; }
+
+    public String getExplanation() { return explanation; }
+    public void setExplanation(String explanation) { this.explanation = explanation; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

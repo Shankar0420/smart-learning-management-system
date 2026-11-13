@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Academic Grades - Galgotias LMS</title>
+    <title>Academic Performance & Certificates - Galgotias LMS</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/components.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
@@ -15,20 +15,103 @@
 
       <div class="dashboard-main">
         <div id="header-container">
-          <span id="page-title-text" class="hidden">Grades</span>
+          <span id="page-title-text" class="hidden">Grades & Certificates</span>
         </div>
 
         <main class="dashboard-content">
-          <div style="margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Academic Performance & Grades</h2>
-            <p class="text-muted" style="font-size: 0.875rem;">Verified marks and instructor feedback from the MariaDB database</p>
+          <!-- Page Title -->
+          <div style="margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Academic Performance, Analytics & Certificates</h2>
+            <p class="text-muted" style="font-size: 0.875rem;">Comprehensive CGPA projection, attendance compliance, gradebook, and verified credentials</p>
           </div>
 
           <div id="grades-error-area" class="alert alert-danger hidden"></div>
 
-          <div class="card">
+          <!-- Academic Performance Summary Cards -->
+          <div class="stats-grid" id="analytics-summary-cards" style="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-bottom: 1.5rem;">
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-blue">🎓</div>
+              <div>
+                <span class="stat-label">Projected CGPA</span>
+                <h3 class="stat-value" id="metric-cgpa">--</h3>
+                <span class="stat-meta">Scale: 10.00</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-green">📊</div>
+              <div>
+                <span class="stat-label">Overall Attendance</span>
+                <h3 class="stat-value" id="metric-attendance">--%</h3>
+                <span class="stat-meta" id="metric-attendance-meta">Requirement: 75%</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-purple">⏱️</div>
+              <div>
+                <span class="stat-label">Quiz Average</span>
+                <h3 class="stat-value" id="metric-quiz-avg">--%</h3>
+                <span class="stat-meta">Assessments Score</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap stat-icon-amber">📝</div>
+              <div>
+                <span class="stat-label">Assignments Done</span>
+                <h3 class="stat-value" id="metric-assignments">--</h3>
+                <span class="stat-meta" id="metric-assignments-meta">Submitted / Total</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attendance Compliance Alert Banner (Conditional) -->
+          <div id="attendance-warning-banner" class="alert alert-warning hidden" style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <strong>⚠️ Attendance Notice:</strong> Your overall attendance is currently below the university mandatory 75% threshold. Please attend upcoming lectures to maintain examination eligibility.
+            </div>
+          </div>
+
+          <!-- Digital Certificates Section -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h3 class="card-title">📜 Verified University Digital Certificates</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Official course completion certificates with tamper-proof verification hashes</p>
+              </div>
+              <button id="claim-cert-btn" class="btn btn-primary btn-sm" onclick="window.checkEligibleCertificates()">
+                ✨ Claim Eligible Certificate
+              </button>
+            </div>
+            <div class="card-body" id="certificates-container" style="padding: 1.25rem;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading digital certificates...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Course Performance Breakdown -->
+          <div class="card" style="margin-bottom: 1.5rem;">
             <div class="card-header">
-              <h3 class="card-title">Gradebook Records</h3>
+              <h3 class="card-title">Subject-Wise Performance & Attendance Breakdown</h3>
+            </div>
+            <div class="card-body" id="course-breakdown-container" style="padding: 0;">
+              <div class="loading-container">
+                <div class="spinner-primary"></div>
+                <p>Loading course breakdown...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gradebook Records Section -->
+          <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h3 class="card-title">Detailed Gradebook Records</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin: 0.2rem 0 0 0;">Individual assignment marks and quiz scores evaluated by faculty</p>
+              </div>
               <span class="badge badge-info" id="grades-count-badge">0 Records</span>
             </div>
             <div class="card-body" id="grades-table-container" style="padding: 0;">
@@ -42,6 +125,33 @@
       </div>
     </div>
 
+    <!-- Claim Certificate Modal -->
+    <div class="modal-overlay" id="claim-cert-modal">
+      <div class="modal-container" style="max-width: 550px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Claim Course Certificate</h3>
+          <button class="modal-close" onclick="window.common.closeModal('claim-cert-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 1rem;">
+            Certificates are issued for courses where you have completed the syllabus requirements and assessments.
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="claim-course-select">Select Course</label>
+            <select id="claim-course-select" class="form-input">
+              <option value="">Choose an enrolled course...</option>
+            </select>
+          </div>
+          <div id="claim-cert-status" style="margin-top: 0.5rem;"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="window.common.closeModal('claim-cert-modal')">Cancel</button>
+          <button class="btn btn-primary" id="btn-submit-claim" onclick="window.submitCertificateClaim()">Generate Certificate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>

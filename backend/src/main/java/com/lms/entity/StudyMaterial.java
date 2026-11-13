@@ -45,6 +45,30 @@ public class StudyMaterial {
     @Column(nullable = false, length = 500)
     private String filePath;
 
+    @Column(nullable = false, length = 50)
+    private String category = "LECTURE_NOTES";
+
+    @Column(length = 20)
+    private String semester;
+
+    @Column(length = 20)
+    private String academicYear;
+
+    @Column(length = 100)
+    private String department;
+
+    @Column(length = 150)
+    private String subject;
+
+    @Column(nullable = false)
+    private boolean published = true;
+
+    @Column(nullable = false)
+    private int downloadCount = 0;
+
+    @Column(nullable = false)
+    private int viewCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploaded_by", nullable = false)
     private User uploadedBy;
@@ -88,6 +112,30 @@ public class StudyMaterial {
 
     public String getFilePath() { return filePath; }
     public void setFilePath(String filePath) { this.filePath = filePath; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category != null ? category : "LECTURE_NOTES"; }
+
+    public String getSemester() { return semester; }
+    public void setSemester(String semester) { this.semester = semester; }
+
+    public String getAcademicYear() { return academicYear; }
+    public void setAcademicYear(String academicYear) { this.academicYear = academicYear; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
+
+    public boolean isPublished() { return published; }
+    public void setPublished(boolean published) { this.published = published; }
+
+    public int getDownloadCount() { return downloadCount; }
+    public void setDownloadCount(int downloadCount) { this.downloadCount = downloadCount; }
+
+    public int getViewCount() { return viewCount; }
+    public void setViewCount(int viewCount) { this.viewCount = viewCount; }
 
     public User getUploadedBy() { return uploadedBy; }
     public void setUploadedBy(User uploadedBy) { this.uploadedBy = uploadedBy; }
